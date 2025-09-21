@@ -172,5 +172,168 @@ namespace ImageProcessing
             }
             return null;
         }
+
+        public Image SubtractImage(Image image, Image backgroundImage)
+        {
+            return subtractWithFullColor(image, backgroundImage);
+        }
+
+        private Bitmap ResizeBitmap(Image original, int newWidth, int newHeight)
+        {
+            Bitmap resized = new Bitmap(newWidth, newHeight);
+
+            using (Graphics g = Graphics.FromImage(resized))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(original, 0, 0, newWidth, newHeight);
+            }
+
+            return resized;
+        }
+
+        private Image subtractWithGrey(Image image, Image backgroundImage)
+        {
+            try
+            {
+                Bitmap imageBitmap = new Bitmap(image);
+                Bitmap backgroundBitmap = new Bitmap(backgroundImage);
+
+                if (imageBitmap.Width != backgroundBitmap.Width ||
+                    imageBitmap.Height != backgroundBitmap.Height)
+                {
+                    MessageBox.Show("Resizing Bigger Image: Images must have the same dimensions");
+
+                    int originalArea = imageBitmap.Width * imageBitmap.Height;
+                    int backgroundArea = backgroundBitmap.Width * backgroundBitmap.Height;
+
+                    if (originalArea > backgroundArea)
+                    {
+                        imageBitmap = ResizeBitmap(imageBitmap, backgroundBitmap.Width, backgroundBitmap.Height);
+                    }
+                    else
+                    {
+                        backgroundBitmap = ResizeBitmap(backgroundBitmap, imageBitmap.Width, imageBitmap.Height);
+                    }
+                }
+
+                if (imageBitmap.Width != backgroundBitmap.Width ||
+                    imageBitmap.Height != backgroundBitmap.Height)
+                {
+                    MessageBox.Show("Error resizing image");
+                    return null;
+                }
+
+                Bitmap resultBitmap = new Bitmap(imageBitmap.Width, imageBitmap.Height);
+
+                using (ColorDialog cd = new ColorDialog())
+                {
+                    cd.AllowFullOpen = true;
+                    cd.ShowHelp = true;
+
+                    if (cd.ShowDialog() == DialogResult.OK)
+                    {
+                        Color subtractColor = cd.Color;
+                        int greySubtractValue = (subtractColor.R + subtractColor.G + subtractColor.B) / 3;
+                        int threshold = 5;
+
+                        for (int x = 0; x < imageBitmap.Width; x++)
+                        {
+                            for (int y = 0; y < imageBitmap.Height; y++)
+                            {
+                                Color pixel = imageBitmap.GetPixel(x, y);
+                                Color backPixel = backgroundBitmap.GetPixel(x, y);
+                                int greyImage = (pixel.R + pixel.G + pixel.B) / 3;
+                                int subtractValue = Math.Abs(greyImage - greySubtractValue);
+                                if (subtractValue > threshold)
+                                    resultBitmap.SetPixel(x, y, pixel);
+                                else
+                                    resultBitmap.SetPixel(x, y, backPixel);
+                            }
+                        }
+                    }
+                }
+                return (Image)resultBitmap;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error subtracting image: " + ex.Message);
+            }
+
+            return null;
+        }
+
+        private Image subtractWithFullColor(Image image, Image backgroundImage)
+        {
+            try
+            {
+                Bitmap imageBitmap = new Bitmap(image);
+                Bitmap backgroundBitmap = new Bitmap(backgroundImage);
+
+                if (imageBitmap.Width != backgroundBitmap.Width ||
+                    imageBitmap.Height != backgroundBitmap.Height)
+                {
+                    MessageBox.Show("Resizing Bigger Image: Images must have the same dimensions");
+
+                    int originalArea = imageBitmap.Width * imageBitmap.Height;
+                    int backgroundArea = backgroundBitmap.Width * backgroundBitmap.Height;
+
+                    if (originalArea > backgroundArea)
+                    {
+                        imageBitmap = ResizeBitmap(imageBitmap, backgroundBitmap.Width, backgroundBitmap.Height);
+                    }
+                    else
+                    {
+                        backgroundBitmap = ResizeBitmap(backgroundBitmap, imageBitmap.Width, imageBitmap.Height);
+                    }
+                }
+
+                if (imageBitmap.Width != backgroundBitmap.Width ||
+                    imageBitmap.Height != backgroundBitmap.Height)
+                {
+                    MessageBox.Show("Error resizing image");
+                    return null;
+                }
+
+                Bitmap resultBitmap = new Bitmap(imageBitmap.Width, imageBitmap.Height);
+
+                using (ColorDialog cd = new ColorDialog())
+                {
+                    cd.AllowFullOpen = true;
+                    cd.ShowHelp = true;
+
+                    if (cd.ShowDialog() == DialogResult.OK)
+                    {
+                        Color subtractColor = cd.Color;
+                        int threshold = 150;
+
+                        for (int x = 0; x < imageBitmap.Width; x++)
+                        {
+                            for (int y = 0; y < imageBitmap.Height; y++)
+                            {
+                                Color pixel = imageBitmap.GetPixel(x, y);
+                                Color backPixel = backgroundBitmap.GetPixel(x, y);
+
+                                int diffR = Math.Abs(pixel.R - subtractColor.R);
+                                int diffG = Math.Abs(pixel.G - subtractColor.G);
+                                int diffB = Math.Abs(pixel.B - subtractColor.B);
+
+                                double distance = Math.Sqrt(diffR * diffR + diffG * diffG + diffB * diffB);
+                                if (distance > threshold)
+                                    resultBitmap.SetPixel(x, y, pixel);
+                                else
+                                    resultBitmap.SetPixel(x, y, backPixel);
+                            }
+                        }
+                    }
+                }
+                return (Image)resultBitmap;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error subtracting image: " + ex.Message);
+            }
+
+            return null;
+        }
     }
 }

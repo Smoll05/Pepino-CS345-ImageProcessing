@@ -9,18 +9,8 @@ namespace ImageProcessing
 {
     internal class ImageManagementService
     {
-        PictureBox  originalImage;
-        PictureBox  editedImage;
-        FormsPlot   histogramPlot;
 
-        public ImageManagementService(PictureBox original, PictureBox edited, FormsPlot histogramPlot)
-        {
-            this.originalImage = original;
-            this.editedImage = edited;
-            this.histogramPlot = histogramPlot;
-        }
-
-        public bool LoadImage()
+        public bool LoadImage(PictureBox pictureBox)
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
@@ -33,8 +23,8 @@ namespace ImageProcessing
                     try
                     {
                         var img = Image.FromFile(ofd.FileName);
-                        originalImage.Image = img;
-                        originalImage.SizeMode = PictureBoxSizeMode.Zoom;
+                        pictureBox.Image = img;
+                        pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
                         return true;
                     }
                     catch (Exception ex)
@@ -46,26 +36,13 @@ namespace ImageProcessing
             }
         }
 
-        public bool SaveImage(bool histogramFormat = false)
+        public bool SaveImage(PictureBox editedPictureImage)
         {
-            if (histogramFormat)
-            {
-                return SaveWithHistogram();
-            }
-            else
-            {
-                return SaveWithImage();
-            }
-        }
-
-        private bool SaveWithImage()
-        {
-            if (editedImage.Image == null)
-            {
-                MessageBox.Show("No Edited Image To Save!");
-                return false;
-            }
-
+            //if (editedImage.Image == null)
+            //{
+            //    MessageBox.Show("No Edited Image To Save!");
+            //    return false;
+            //}
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
                 sfd.Title = "Save Image As";
@@ -85,7 +62,7 @@ namespace ImageProcessing
                             case 4: format = System.Drawing.Imaging.ImageFormat.Gif; break;
                         }
 
-                        editedImage.Image.Save(sfd.FileName, format);
+                        editedPictureImage.Image.Save(sfd.FileName, format);
 
                         return true;
                     }
@@ -98,7 +75,7 @@ namespace ImageProcessing
             return false;
         }
 
-        private bool SaveWithHistogram()
+        public bool SaveHistogram(FormsPlot histogramPlot)
         {
             if (histogramPlot.Plot == null)
             {
@@ -118,11 +95,11 @@ namespace ImageProcessing
                     {
                         switch (sfd.FilterIndex)
                         {
-                            case 1:     histogramPlot.Plot.SaveJpeg(sfd.FileName, 800, 800); break;
-                            case 2:     histogramPlot.Plot.SavePng(sfd.FileName, 800, 800); break;
-                            case 3:     histogramPlot.Plot.SaveBmp(sfd.FileName, 800, 800); break;
-                            case 4:     histogramPlot.Plot.SaveSvg(sfd.FileName, 800, 800); break;
-                            default:    histogramPlot.Plot.SaveJpeg(sfd.FileName, 800, 800); break;
+                            case 1: histogramPlot.Plot.SaveJpeg(sfd.FileName, 800, 800); break;
+                            case 2: histogramPlot.Plot.SavePng(sfd.FileName, 800, 800); break;
+                            case 3: histogramPlot.Plot.SaveBmp(sfd.FileName, 800, 800); break;
+                            case 4: histogramPlot.Plot.SaveSvg(sfd.FileName, 800, 800); break;
+                            default: histogramPlot.Plot.SaveJpeg(sfd.FileName, 800, 800); break;
                         }
 
                         return true;

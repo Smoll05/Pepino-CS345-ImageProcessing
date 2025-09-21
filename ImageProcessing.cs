@@ -6,19 +6,32 @@ namespace ImageProcessing
         ImageProcessingService imageProcessingService;
         bool hasImageLoaded;
         bool hasImageEdited;
+        bool hasBackgroundLoaded;
         bool isCreatingHistogram;
+
+        // 1 - Normal Edit
+        // 2 - Subtract Edit
+        // 3 - WebCam Subtract
+        int panelNumberShown;
 
         public ImageProcessing()
         {
             InitializeComponent();
-            imageManagementService = new ImageManagementService(
-                originalImagePicture, editedImagePicture, histogramPlot
-            );
 
+            mainPanel.Controls.Clear();
+            mainPanel.Controls.Add(subPanel1);
+            subtractImageToolStripMenuItem.Visible = false;
+            subtractWebcamToolStripMenuItem.Visible = false;
+            loadOriginalToolStripMenuItem.Visible = false;
+            loadBackgroundToolStripMenuItem.Visible = false;
+            panelNumberShown = 1;
+
+            imageManagementService = new ImageManagementService();
             imageProcessingService = new ImageProcessingService();
             hasImageLoaded = false;
             hasImageEdited = false;
             isCreatingHistogram = false;
+            panelNumberShown = 1;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -28,21 +41,46 @@ namespace ImageProcessing
 
         private void loadImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            hasImageLoaded = imageManagementService.LoadImage();
+            if (panelNumberShown == 1)
+            {
+                hasImageLoaded = imageManagementService.LoadImage(originalImagePicture);
+            }
         }
 
         private void saveImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (hasImageEdited)
+            if (!hasImageEdited)
             {
-                if (imageManagementService.SaveImage(isCreatingHistogram))
+                MessageBox.Show("No Edited Image To Save!");
+                return;
+            }
+
+            if (panelNumberShown == 1)
+            {
+                if (isCreatingHistogram)
+                {
+                    if (imageManagementService.SaveHistogram(histogramPlot))
+                    {
+                        MessageBox.Show("Histogram Saved Successfully!");
+                    }
+                }
+                else
+                {
+                    if (imageManagementService.SaveImage(editedImagePicture))
+                    {
+                        MessageBox.Show("Image Saved Successfully!");
+                    }
+                }
+
+                return;
+            }
+
+            if (panelNumberShown == 2)
+            {
+                if (imageManagementService.SaveImage(subtractResultPicture))
                 {
                     MessageBox.Show("Image Saved Successfully!");
                 }
-            }
-            else
-            {
-                MessageBox.Show("No Edited Image To Save!");
             }
         }
 
@@ -106,7 +144,7 @@ namespace ImageProcessing
             }
 
             isCreatingHistogram = imageProcessingService.HistogramPlot(originalImagePicture.Image, histogramPlot);
-            hasImageEdited      = isCreatingHistogram;
+            hasImageEdited = isCreatingHistogram;
         }
 
         private void sepiaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -162,6 +200,67 @@ namespace ImageProcessing
         {
             histogramPanel.Visible = false;
             resultImagePanel.Visible = true;
+        }
+
+        private void normalEditToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            panelNumberShown = 1;
+            mainPanel.Controls.Clear();
+            mainPanel.Controls.Add(subPanel1);
+            subtractImageToolStripMenuItem.Visible = false;
+            subtractWebcamToolStripMenuItem.Visible = false;
+            loadOriginalToolStripMenuItem.Visible = false;
+            loadBackgroundToolStripMenuItem.Visible = false;
+            editImageToolStripMenuItem.Visible = true;
+        }
+
+        private void subtractEditToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            panelNumberShown = 2;
+            mainPanel.Controls.Clear();
+            mainPanel.Controls.Add(subPanel2);
+            loadOriginalToolStripMenuItem.Visible = true;
+            loadBackgroundToolStripMenuItem.Visible = true;
+            editImageToolStripMenuItem.Visible = false;
+            subtractImageToolStripMenuItem.Visible = true;
+        }
+
+        private void webcamSubtractToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            panelNumberShown = 3;
+            mainPanel.Controls.Clear();
+            mainPanel.Controls.Add(subPanel3);
+            loadOriginalToolStripMenuItem.Visible = false;
+            loadBackgroundToolStripMenuItem.Visible = false;
+            editImageToolStripMenuItem.Visible = false;
+            subtractWebcamToolStripMenuItem.Visible = true;
+        }
+
+        private void loadOriginalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            hasImageLoaded = imageManagementService.LoadImage(subtractImagePicture);
+        }
+
+        private void loadBackgroundToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            hasBackgroundLoaded = imageManagementService.LoadImage(subtractBackgroundPicture);
+        }
+
+        private void subtractImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded || !hasBackgroundLoaded)
+            {
+                MessageBox.Show("Load Both An Image And A Background First!");
+                return;
+            }
+
+            Image editedImage = imageProcessingService.SubtractImage(subtractImagePicture.Image, subtractBackgroundPicture.Image);
+            if (editedImage != null)
+            {
+                subtractResultPicture.Image = editedImage;
+                subtractResultPicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
         }
     }
 }
