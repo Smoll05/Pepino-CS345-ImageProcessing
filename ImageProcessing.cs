@@ -1,13 +1,16 @@
+using System.Windows.Forms;
+
 namespace ImageProcessing
 {
     public partial class ImageProcessing : Form
     {
         ImageManagementService imageManagementService;
-        ImageProcessingService imageProcessingService;
+        WebcamManager webcamManager;
         bool hasImageLoaded;
         bool hasImageEdited;
         bool hasBackgroundLoaded;
         bool isCreatingHistogram;
+        bool isCameraStarted;
 
         // 1 - Normal Edit
         // 2 - Subtract Edit
@@ -20,18 +23,18 @@ namespace ImageProcessing
 
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel1);
-            subtractImageToolStripMenuItem.Visible = false;
-            subtractWebcamToolStripMenuItem.Visible = false;
-            loadOriginalToolStripMenuItem.Visible = false;
-            loadBackgroundToolStripMenuItem.Visible = false;
-            panelNumberShown = 1;
+            subtractImageToolStripMenuItem.Visible      = false;
+            loadOriginalToolStripMenuItem.Visible       = false;
+            loadBackgroundToolStripMenuItem.Visible     = false;
+            subtractToolStripMenuItem.Visible           = false;
 
-            imageManagementService = new ImageManagementService();
-            imageProcessingService = new ImageProcessingService();
-            hasImageLoaded = false;
-            hasImageEdited = false;
-            isCreatingHistogram = false;
-            panelNumberShown = 1;
+            imageManagementService  = new ImageManagementService();
+            webcamManager           = null;
+            hasImageLoaded          = false;
+            hasImageEdited          = false;
+            isCreatingHistogram     = false;
+            isCameraStarted         = false;
+            panelNumberShown        = 1;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -49,6 +52,21 @@ namespace ImageProcessing
 
         private void saveImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (panelNumberShown == 3)
+            {
+                if(!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                if (imageManagementService.SaveImage(webcamDisplay.Image))
+                {
+                    MessageBox.Show("Image Saved!");
+                }
+                return;
+            }
+
             if (!hasImageEdited)
             {
                 MessageBox.Show("No Edited Image To Save!");
@@ -66,25 +84,22 @@ namespace ImageProcessing
                 }
                 else
                 {
-                    if (imageManagementService.SaveImage(editedImagePicture))
+                    if (imageManagementService.SaveImage(editedImagePicture.Image))
                     {
                         MessageBox.Show("Image Saved Successfully!");
                     }
                 }
-
-                return;
             }
-
-            if (panelNumberShown == 2)
+            else if (panelNumberShown == 2)
             {
-                if (imageManagementService.SaveImage(subtractResultPicture))
+                if (imageManagementService.SaveImage(editedImagePicture.Image))
                 {
                     MessageBox.Show("Image Saved Successfully!");
                 }
             }
         }
 
-        private void copyStripMenuItem1_Click(object sender, EventArgs e)
+        private void copyStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!hasImageLoaded)
             {
@@ -92,7 +107,7 @@ namespace ImageProcessing
                 return;
             }
 
-            Image editedImage = imageProcessingService.CopyImage(originalImagePicture.Image);
+            Image editedImage = ImageProcessingService.CopyImage(originalImagePicture.Image);
             if (editedImage != null)
             {
                 editedImagePicture.Image = editedImage;
@@ -103,35 +118,63 @@ namespace ImageProcessing
 
         private void greyscaleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = imageProcessingService.GreyScaleImage(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.GreyScaleImage(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                MessageBox.Show("gwefoewnfewnfewofnew");
+
+                webcamManager.CurrentFilter = FilterType.Grayscale;
             }
         }
 
         private void inverseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = imageProcessingService.InvertImage(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.InvertImage(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                webcamManager.CurrentFilter = FilterType.Invert;
             }
         }
 
@@ -143,24 +186,37 @@ namespace ImageProcessing
                 return;
             }
 
-            isCreatingHistogram = imageProcessingService.HistogramPlot(originalImagePicture.Image, histogramPlot);
+            isCreatingHistogram = ImageProcessingService.HistogramPlot(originalImagePicture.Image, histogramPlot);
             hasImageEdited = isCreatingHistogram;
         }
 
         private void sepiaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = imageProcessingService.SepiaImage(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.SepiaImage(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                webcamManager.CurrentFilter = FilterType.Sepia;
             }
         }
 
@@ -169,7 +225,7 @@ namespace ImageProcessing
             int intensityFactor = intensityBar.Value;
             if (hasImageLoaded)
             {
-                Image editedImage = imageProcessingService.GreyScaleImage(originalImagePicture.Image, intensityFactor);
+                Image editedImage = ImageProcessingService.GreyScaleImage(originalImagePicture.Image, intensityFactor);
                 if (editedImage != null)
                 {
                     editedImagePicture.Image = editedImage;
@@ -204,36 +260,42 @@ namespace ImageProcessing
 
         private void normalEditToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            panelNumberShown = 1;
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel1);
-            subtractImageToolStripMenuItem.Visible = false;
-            subtractWebcamToolStripMenuItem.Visible = false;
-            loadOriginalToolStripMenuItem.Visible = false;
+            
+            panelNumberShown                        = 1;
+            subtractImageToolStripMenuItem.Visible  = false;
+            loadOriginalToolStripMenuItem.Visible   = false;
             loadBackgroundToolStripMenuItem.Visible = false;
-            editImageToolStripMenuItem.Visible = true;
+            editImageToolStripMenuItem.Visible      = true;
+            subtractToolStripMenuItem.Visible       = false;
+            copyStripMenuItem.Visible               = true;
         }
 
         private void subtractEditToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            panelNumberShown = 2;
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel2);
-            loadOriginalToolStripMenuItem.Visible = true;
+
+            panelNumberShown                        = 2;
+            loadOriginalToolStripMenuItem.Visible   = true;
             loadBackgroundToolStripMenuItem.Visible = true;
-            editImageToolStripMenuItem.Visible = false;
-            subtractImageToolStripMenuItem.Visible = true;
+            editImageToolStripMenuItem.Visible      = false;
+            subtractImageToolStripMenuItem.Visible  = true;
+            subtractToolStripMenuItem.Visible       = false;
         }
 
         private void webcamSubtractToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            panelNumberShown = 3;
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel3);
-            loadOriginalToolStripMenuItem.Visible = false;
+
+            panelNumberShown                        = 3;
+            loadOriginalToolStripMenuItem.Visible   = false;
             loadBackgroundToolStripMenuItem.Visible = false;
-            editImageToolStripMenuItem.Visible = false;
-            subtractWebcamToolStripMenuItem.Visible = true;
+            editImageToolStripMenuItem.Visible      = true;
+            subtractToolStripMenuItem.Visible       = true;
+            copyStripMenuItem.Visible               = false;
         }
 
         private void loadOriginalToolStripMenuItem_Click(object sender, EventArgs e)
@@ -254,13 +316,33 @@ namespace ImageProcessing
                 return;
             }
 
-            Image editedImage = imageProcessingService.SubtractImage(subtractImagePicture.Image, subtractBackgroundPicture.Image);
+            Image editedImage = ImageProcessingService.SubtractImage(subtractImagePicture.Image, subtractBackgroundPicture.Image);
             if (editedImage != null)
             {
                 subtractResultPicture.Image = editedImage;
                 subtractResultPicture.SizeMode = PictureBoxSizeMode.Zoom;
                 hasImageEdited = true;
             }
+        }
+
+        private void cameraButton_Click(object sender, EventArgs e)
+        {
+
+            if (webcamManager == null)
+                webcamManager = new WebcamManager(webcamDisplay);
+
+            if (isCameraStarted)
+            {
+                webcamManager.stopCamera();
+                cameraButton.Text = "Start Camera";
+            }
+            else
+            {
+                webcamManager.startCamera();
+                cameraButton.Text = "Stop Camera";
+            }
+
+            isCameraStarted = !isCameraStarted;
         }
     }
 }

@@ -36,13 +36,8 @@ namespace ImageProcessing
             }
         }
 
-        public bool SaveImage(PictureBox editedPictureImage)
+        public bool SaveImage(Image editedPictureImage)
         {
-            //if (editedImage.Image == null)
-            //{
-            //    MessageBox.Show("No Edited Image To Save!");
-            //    return false;
-            //}
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
                 sfd.Title = "Save Image As";
@@ -62,8 +57,10 @@ namespace ImageProcessing
                             case 4: format = System.Drawing.Imaging.ImageFormat.Gif; break;
                         }
 
-                        editedPictureImage.Image.Save(sfd.FileName, format);
-
+                        MessageBox.Show(sfd.FileName);
+                        MessageBox.Show(format.ToString());
+                        MessageBox.Show(editedPictureImage.ToString());
+                        editedPictureImage.Save(sfd.FileName, format);
                         return true;
                     }
                     catch (Exception ex)

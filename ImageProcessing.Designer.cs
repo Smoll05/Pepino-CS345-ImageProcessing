@@ -40,7 +40,6 @@
             histogramToolStripMenuItem = new ToolStripMenuItem();
             sepiaToolStripMenuItem = new ToolStripMenuItem();
             subtractImageToolStripMenuItem = new ToolStripMenuItem();
-            subtractWebcamToolStripMenuItem = new ToolStripMenuItem();
             toolToolStripMenuItem = new ToolStripMenuItem();
             normalEditToolStripMenuItem = new ToolStripMenuItem();
             subtractEditToolStripMenuItem = new ToolStripMenuItem();
@@ -60,6 +59,10 @@
             label3 = new Label();
             intensityBar = new TrackBar();
             mainPanel = new Panel();
+            subPanel3 = new Panel();
+            cameraButton = new Button();
+            webcamDisplay = new PictureBox();
+            label8 = new Label();
             subPanel2 = new Panel();
             subtractImagePicture = new PictureBox();
             label5 = new Label();
@@ -68,9 +71,7 @@
             subtractResultPicture = new PictureBox();
             label6 = new Label();
             subPanel1 = new Panel();
-            subPanel3 = new Panel();
-            webcamDisplay = new PictureBox();
-            label8 = new Label();
+            subtractToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             imagePanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -85,19 +86,19 @@
             intensityBarPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)intensityBar).BeginInit();
             mainPanel.SuspendLayout();
+            subPanel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)webcamDisplay).BeginInit();
             subPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)subtractImagePicture).BeginInit();
             ((System.ComponentModel.ISupportInitialize)subtractBackgroundPicture).BeginInit();
             ((System.ComponentModel.ISupportInitialize)subtractResultPicture).BeginInit();
             subPanel1.SuspendLayout();
-            subPanel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)webcamDisplay).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { loadImageToolStripMenuItem, saveImageToolStripMenuItem, editImageToolStripMenuItem, subtractImageToolStripMenuItem, subtractWebcamToolStripMenuItem, toolToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { loadImageToolStripMenuItem, saveImageToolStripMenuItem, editImageToolStripMenuItem, subtractImageToolStripMenuItem, toolToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1262, 28);
@@ -115,7 +116,7 @@
             // loadOriginalToolStripMenuItem
             // 
             loadOriginalToolStripMenuItem.Name = "loadOriginalToolStripMenuItem";
-            loadOriginalToolStripMenuItem.Size = new Size(224, 26);
+            loadOriginalToolStripMenuItem.Size = new Size(171, 26);
             loadOriginalToolStripMenuItem.Text = "Image";
             loadOriginalToolStripMenuItem.Visible = false;
             loadOriginalToolStripMenuItem.Click += loadOriginalToolStripMenuItem_Click;
@@ -123,7 +124,7 @@
             // loadBackgroundToolStripMenuItem
             // 
             loadBackgroundToolStripMenuItem.Name = "loadBackgroundToolStripMenuItem";
-            loadBackgroundToolStripMenuItem.Size = new Size(224, 26);
+            loadBackgroundToolStripMenuItem.Size = new Size(171, 26);
             loadBackgroundToolStripMenuItem.Text = "Background";
             loadBackgroundToolStripMenuItem.Visible = false;
             loadBackgroundToolStripMenuItem.Click += loadBackgroundToolStripMenuItem_Click;
@@ -137,7 +138,7 @@
             // 
             // editImageToolStripMenuItem
             // 
-            editImageToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copyStripMenuItem, greyscaleToolStripMenuItem, inverseToolStripMenuItem, histogramToolStripMenuItem, sepiaToolStripMenuItem });
+            editImageToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copyStripMenuItem, greyscaleToolStripMenuItem, inverseToolStripMenuItem, histogramToolStripMenuItem, sepiaToolStripMenuItem, subtractToolStripMenuItem });
             editImageToolStripMenuItem.Name = "editImageToolStripMenuItem";
             editImageToolStripMenuItem.Size = new Size(95, 24);
             editImageToolStripMenuItem.Text = "Edit Image";
@@ -147,35 +148,40 @@
             copyStripMenuItem.Name = "copyStripMenuItem";
             copyStripMenuItem.Size = new Size(162, 26);
             copyStripMenuItem.Text = "Copy";
-            copyStripMenuItem.Click += hideHistogramChart_Click;
+            copyStripMenuItem.Click += hideIntesnityBar_Click;
+            copyStripMenuItem.Click += copyStripMenuItem_Click;
             // 
             // greyscaleToolStripMenuItem
             // 
             greyscaleToolStripMenuItem.Name = "greyscaleToolStripMenuItem";
             greyscaleToolStripMenuItem.Size = new Size(162, 26);
             greyscaleToolStripMenuItem.Text = "Greyscale";
-            greyscaleToolStripMenuItem.Click += hideHistogramChart_Click;
+            greyscaleToolStripMenuItem.Click += showIntesnityBar_Click;
+            greyscaleToolStripMenuItem.Click += greyscaleToolStripMenuItem_Click;
             // 
             // inverseToolStripMenuItem
             // 
             inverseToolStripMenuItem.Name = "inverseToolStripMenuItem";
             inverseToolStripMenuItem.Size = new Size(162, 26);
             inverseToolStripMenuItem.Text = "Inverse";
-            inverseToolStripMenuItem.Click += hideHistogramChart_Click;
+            inverseToolStripMenuItem.Click += hideIntesnityBar_Click;
+            inverseToolStripMenuItem.Click += inverseToolStripMenuItem_Click;
             // 
             // histogramToolStripMenuItem
             // 
             histogramToolStripMenuItem.Name = "histogramToolStripMenuItem";
             histogramToolStripMenuItem.Size = new Size(162, 26);
             histogramToolStripMenuItem.Text = "Histogram";
-            histogramToolStripMenuItem.Click += showHistogramChart_Click;
+            histogramToolStripMenuItem.Click += hideIntesnityBar_Click;
+            histogramToolStripMenuItem.Click += histogramToolStripMenuItem_Click;
             // 
             // sepiaToolStripMenuItem
             // 
             sepiaToolStripMenuItem.Name = "sepiaToolStripMenuItem";
             sepiaToolStripMenuItem.Size = new Size(162, 26);
             sepiaToolStripMenuItem.Text = "Sepia";
-            sepiaToolStripMenuItem.Click += hideHistogramChart_Click;
+            sepiaToolStripMenuItem.Click += hideIntesnityBar_Click;
+            sepiaToolStripMenuItem.Click += sepiaToolStripMenuItem_Click;
             // 
             // subtractImageToolStripMenuItem
             // 
@@ -183,12 +189,7 @@
             subtractImageToolStripMenuItem.Size = new Size(124, 24);
             subtractImageToolStripMenuItem.Text = "Subtract Image";
             subtractImageToolStripMenuItem.Click += subtractImageToolStripMenuItem_Click;
-            // 
-            // subtractWebcamToolStripMenuItem
-            // 
-            subtractWebcamToolStripMenuItem.Name = "subtractWebcamToolStripMenuItem";
-            subtractWebcamToolStripMenuItem.Size = new Size(140, 24);
-            subtractWebcamToolStripMenuItem.Text = "Subtract Webcam";
+            subtractImageToolStripMenuItem.Click += subtractImageToolStripMenuItem_Click;
             // 
             // toolToolStripMenuItem
             // 
@@ -214,8 +215,8 @@
             // webcamSubtractToolStripMenuItem
             // 
             webcamSubtractToolStripMenuItem.Name = "webcamSubtractToolStripMenuItem";
-            webcamSubtractToolStripMenuItem.Size = new Size(209, 26);
-            webcamSubtractToolStripMenuItem.Text = "Webcam Subtract";
+            webcamSubtractToolStripMenuItem.Size = new Size(224, 26);
+            webcamSubtractToolStripMenuItem.Text = "Webcam";
             webcamSubtractToolStripMenuItem.Click += webcamSubtractToolStripMenuItem_Click;
             // 
             // imagePanel1
@@ -367,11 +368,54 @@
             // 
             // mainPanel
             // 
-            mainPanel.Controls.Add(subPanel2);
+            mainPanel.Controls.Add(subPanel3);
             mainPanel.Location = new Point(18, 31);
             mainPanel.Name = "mainPanel";
             mainPanel.Size = new Size(1232, 640);
             mainPanel.TabIndex = 5;
+            // 
+            // subPanel3
+            // 
+            subPanel3.Controls.Add(cameraButton);
+            subPanel3.Controls.Add(webcamDisplay);
+            subPanel3.Controls.Add(label8);
+            subPanel3.Dock = DockStyle.Fill;
+            subPanel3.Location = new Point(0, 0);
+            subPanel3.Name = "subPanel3";
+            subPanel3.Size = new Size(1232, 640);
+            subPanel3.TabIndex = 7;
+            // 
+            // cameraButton
+            // 
+            cameraButton.FlatStyle = FlatStyle.Flat;
+            cameraButton.Font = new Font("Segoe UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            cameraButton.Location = new Point(551, 587);
+            cameraButton.Name = "cameraButton";
+            cameraButton.Size = new Size(123, 43);
+            cameraButton.TabIndex = 7;
+            cameraButton.Text = "Start Camera";
+            cameraButton.UseVisualStyleBackColor = true;
+            cameraButton.Click += cameraButton_Click;
+            // 
+            // webcamDisplay
+            // 
+            webcamDisplay.Anchor = AnchorStyles.None;
+            webcamDisplay.BorderStyle = BorderStyle.FixedSingle;
+            webcamDisplay.Location = new Point(136, 30);
+            webcamDisplay.Name = "webcamDisplay";
+            webcamDisplay.Size = new Size(960, 540);
+            webcamDisplay.SizeMode = PictureBoxSizeMode.Zoom;
+            webcamDisplay.TabIndex = 0;
+            webcamDisplay.TabStop = false;
+            // 
+            // label8
+            // 
+            label8.Location = new Point(136, 5);
+            label8.Name = "label8";
+            label8.Size = new Size(960, 25);
+            label8.TabIndex = 6;
+            label8.Text = "Webcam";
+            label8.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // subPanel2
             // 
@@ -454,35 +498,11 @@
             subPanel1.Size = new Size(1232, 640);
             subPanel1.TabIndex = 6;
             // 
-            // subPanel3
+            // subtractToolStripMenuItem
             // 
-            subPanel3.Controls.Add(webcamDisplay);
-            subPanel3.Controls.Add(label8);
-            subPanel3.Dock = DockStyle.Fill;
-            subPanel3.Location = new Point(0, 0);
-            subPanel3.Name = "subPanel3";
-            subPanel3.Size = new Size(1232, 640);
-            subPanel3.TabIndex = 7;
-            // 
-            // webcamDisplay
-            // 
-            webcamDisplay.Anchor = AnchorStyles.None;
-            webcamDisplay.BorderStyle = BorderStyle.FixedSingle;
-            webcamDisplay.Location = new Point(136, 30);
-            webcamDisplay.Name = "webcamDisplay";
-            webcamDisplay.Size = new Size(960, 540);
-            webcamDisplay.SizeMode = PictureBoxSizeMode.Zoom;
-            webcamDisplay.TabIndex = 0;
-            webcamDisplay.TabStop = false;
-            // 
-            // label8
-            // 
-            label8.Location = new Point(136, 580);
-            label8.Name = "label8";
-            label8.Size = new Size(960, 25);
-            label8.TabIndex = 6;
-            label8.Text = "Webcam";
-            label8.TextAlign = ContentAlignment.MiddleCenter;
+            subtractToolStripMenuItem.Name = "subtractToolStripMenuItem";
+            subtractToolStripMenuItem.Size = new Size(224, 26);
+            subtractToolStripMenuItem.Text = "Subtract";
             // 
             // ImageProcessing
             // 
@@ -514,13 +534,13 @@
             intensityBarPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)intensityBar).EndInit();
             mainPanel.ResumeLayout(false);
+            subPanel3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)webcamDisplay).EndInit();
             subPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)subtractImagePicture).EndInit();
             ((System.ComponentModel.ISupportInitialize)subtractBackgroundPicture).EndInit();
             ((System.ComponentModel.ISupportInitialize)subtractResultPicture).EndInit();
             subPanel1.ResumeLayout(false);
-            subPanel3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)webcamDisplay).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -568,6 +588,7 @@
         private ToolStripMenuItem loadOriginalToolStripMenuItem;
         private ToolStripMenuItem loadBackgroundToolStripMenuItem;
         private ToolStripMenuItem subtractImageToolStripMenuItem;
-        private ToolStripMenuItem subtractWebcamToolStripMenuItem;
+        private Button cameraButton;
+        private ToolStripMenuItem subtractToolStripMenuItem;
     }
 }

@@ -1,19 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ImageProcessing
 {
-    internal class ImageProcessingService
+    internal static class ImageProcessingService
     {
-        public Image CopyImage(Image originalImage)
+        public static Bitmap ApplyWebCamFilter(Bitmap bitmap, FilterType type)
+        {
+            switch(type)
+            {
+                case FilterType.None:
+                    return bitmap;
+                case FilterType.Grayscale:
+                    return (Bitmap)GreyScaleImage(bitmap);
+                case FilterType.Invert:
+                    return (Bitmap)InvertImage(bitmap);
+                case FilterType.Sepia:
+                    return (Bitmap)SepiaImage(bitmap);
+                default:
+                    return bitmap;
+            }
+        }
+        public static Image CopyImage(Image originalImage)
         {
             try
             {
-                Bitmap originalBitmap   = new Bitmap(originalImage);
-                Bitmap copiedBitmap     = new Bitmap(originalBitmap.Width, originalBitmap.Height);
+                Bitmap originalBitmap = new Bitmap(originalImage);
+                Bitmap copiedBitmap = new Bitmap(originalBitmap.Width, originalBitmap.Height);
 
                 for (int y = 0; y < originalBitmap.Height; y++)
                 {
@@ -34,12 +51,12 @@ namespace ImageProcessing
             return null;
         }
 
-        public Image GreyScaleImage(Image originalImage, int intensityFactor = 50)
+        public static Image GreyScaleImage(Image originalImage, int intensityFactor = 50)
         {
             try
             {
-                Bitmap originalBitmap   = new Bitmap(originalImage);
-                Bitmap greyScaleBitmap  = new Bitmap(originalBitmap.Width, originalBitmap.Height);
+                Bitmap originalBitmap = new Bitmap(originalImage);
+                Bitmap greyScaleBitmap = new Bitmap(originalBitmap.Width, originalBitmap.Height);
 
                 for (int y = 0; y < originalBitmap.Height; y++)
                 {
@@ -65,7 +82,7 @@ namespace ImageProcessing
             return null;
         }
 
-        public Image InvertImage(Image originalImage)
+        public static Image InvertImage(Image originalImage)
         {
             try
             {
@@ -77,7 +94,7 @@ namespace ImageProcessing
                     for (int x = 0; x < originalBitmap.Width; x++)
                     {
                         Color pixel = originalBitmap.GetPixel(x, y);
-                        Color greyPixel = Color.FromArgb(255-pixel.R, 255 - pixel.G, 255 - pixel.B);
+                        Color greyPixel = Color.FromArgb(255 - pixel.R, 255 - pixel.G, 255 - pixel.B);
                         invertedBitmap.SetPixel(x, y, greyPixel);
                     }
                 }
@@ -92,7 +109,7 @@ namespace ImageProcessing
             return null;
         }
 
-        public bool HistogramPlot(Image originalImage, ScottPlot.WinForms.FormsPlot histogramPlot)
+        public static bool HistogramPlot(Image originalImage, ScottPlot.WinForms.FormsPlot histogramPlot)
         {
             try
             {
@@ -109,7 +126,7 @@ namespace ImageProcessing
                 }
 
                 double[] counts = Array.ConvertAll(histogram, i => (double)i);
-                double[] bins   = Enumerable.Range(0, 256).Select(i => (double)i).ToArray();
+                double[] bins = Enumerable.Range(0, 256).Select(i => (double)i).ToArray();
 
                 var hist = ScottPlot.Statistics.Histogram.WithBinSize(1, bins);
 
@@ -138,7 +155,7 @@ namespace ImageProcessing
             return false;
         }
 
-        public Image SepiaImage(Image originalImage)
+        public static Image SepiaImage(Image originalImage)
         {
             try
             {
@@ -151,13 +168,13 @@ namespace ImageProcessing
                     {
                         Color pixel = originalBitmap.GetPixel(x, y);
 
-                        int sepiaRed    = (int)(.393 * pixel.R + .769 * pixel.G + .189 * pixel.B);
-                        int sepiaGreen  = (int)(.349 * pixel.R + .686 * pixel.G + .168 * pixel.B);
-                        int sepiaBlue   = (int)(.272 * pixel.R + .534 * pixel.G + .131 * pixel.B);
+                        int sepiaRed = (int)(.393 * pixel.R + .769 * pixel.G + .189 * pixel.B);
+                        int sepiaGreen = (int)(.349 * pixel.R + .686 * pixel.G + .168 * pixel.B);
+                        int sepiaBlue = (int)(.272 * pixel.R + .534 * pixel.G + .131 * pixel.B);
 
-                        sepiaRed    = sepiaRed > 255 ? 255 : sepiaRed;
-                        sepiaGreen  = sepiaGreen > 255 ? 255 : sepiaGreen;
-                        sepiaBlue   = sepiaBlue > 255 ? 255 : sepiaBlue;
+                        sepiaRed = sepiaRed > 255 ? 255 : sepiaRed;
+                        sepiaGreen = sepiaGreen > 255 ? 255 : sepiaGreen;
+                        sepiaBlue = sepiaBlue > 255 ? 255 : sepiaBlue;
 
                         Color greyPixel = Color.FromArgb(sepiaRed, sepiaGreen, sepiaBlue);
                         sepiaBitmap.SetPixel(x, y, greyPixel);
@@ -173,12 +190,12 @@ namespace ImageProcessing
             return null;
         }
 
-        public Image SubtractImage(Image image, Image backgroundImage)
+        public static Image SubtractImage(Image image, Image backgroundImage)
         {
-            return subtractWithFullColor(image, backgroundImage);
+            return SubtractWithFullColor(image, backgroundImage);
         }
 
-        private Bitmap ResizeBitmap(Image original, int newWidth, int newHeight)
+        private static Bitmap ResizeBitmap(Image original, int newWidth, int newHeight)
         {
             Bitmap resized = new Bitmap(newWidth, newHeight);
 
@@ -191,7 +208,7 @@ namespace ImageProcessing
             return resized;
         }
 
-        private Image subtractWithGrey(Image image, Image backgroundImage)
+        private static Image SubtractWithGrey(Image image, Image backgroundImage)
         {
             try
             {
@@ -225,31 +242,22 @@ namespace ImageProcessing
 
                 Bitmap resultBitmap = new Bitmap(imageBitmap.Width, imageBitmap.Height);
 
-                using (ColorDialog cd = new ColorDialog())
+                Color subtractColor = GetColor();
+                int greySubtractValue = (subtractColor.R + subtractColor.G + subtractColor.B) / 3;
+                int threshold = 5;
+
+                for (int x = 0; x < imageBitmap.Width; x++)
                 {
-                    cd.AllowFullOpen = true;
-                    cd.ShowHelp = true;
-
-                    if (cd.ShowDialog() == DialogResult.OK)
+                    for (int y = 0; y < imageBitmap.Height; y++)
                     {
-                        Color subtractColor = cd.Color;
-                        int greySubtractValue = (subtractColor.R + subtractColor.G + subtractColor.B) / 3;
-                        int threshold = 5;
-
-                        for (int x = 0; x < imageBitmap.Width; x++)
-                        {
-                            for (int y = 0; y < imageBitmap.Height; y++)
-                            {
-                                Color pixel = imageBitmap.GetPixel(x, y);
-                                Color backPixel = backgroundBitmap.GetPixel(x, y);
-                                int greyImage = (pixel.R + pixel.G + pixel.B) / 3;
-                                int subtractValue = Math.Abs(greyImage - greySubtractValue);
-                                if (subtractValue > threshold)
-                                    resultBitmap.SetPixel(x, y, pixel);
-                                else
-                                    resultBitmap.SetPixel(x, y, backPixel);
-                            }
-                        }
+                        Color pixel = imageBitmap.GetPixel(x, y);
+                        Color backPixel = backgroundBitmap.GetPixel(x, y);
+                        int greyImage = (pixel.R + pixel.G + pixel.B) / 3;
+                        int subtractValue = Math.Abs(greyImage - greySubtractValue);
+                        if (subtractValue > threshold)
+                            resultBitmap.SetPixel(x, y, pixel);
+                        else
+                            resultBitmap.SetPixel(x, y, backPixel);
                     }
                 }
                 return (Image)resultBitmap;
@@ -262,7 +270,7 @@ namespace ImageProcessing
             return null;
         }
 
-        private Image subtractWithFullColor(Image image, Image backgroundImage)
+        private static Image SubtractWithFullColor(Image image, Image backgroundImage)
         {
             try
             {
@@ -296,36 +304,28 @@ namespace ImageProcessing
 
                 Bitmap resultBitmap = new Bitmap(imageBitmap.Width, imageBitmap.Height);
 
-                using (ColorDialog cd = new ColorDialog())
+                Color subtractColor = GetColor();
+                int threshold = 150;
+
+                for (int x = 0; x < imageBitmap.Width; x++)
                 {
-                    cd.AllowFullOpen = true;
-                    cd.ShowHelp = true;
-
-                    if (cd.ShowDialog() == DialogResult.OK)
+                    for (int y = 0; y < imageBitmap.Height; y++)
                     {
-                        Color subtractColor = cd.Color;
-                        int threshold = 150;
+                        Color pixel = imageBitmap.GetPixel(x, y);
+                        Color backPixel = backgroundBitmap.GetPixel(x, y);
 
-                        for (int x = 0; x < imageBitmap.Width; x++)
-                        {
-                            for (int y = 0; y < imageBitmap.Height; y++)
-                            {
-                                Color pixel = imageBitmap.GetPixel(x, y);
-                                Color backPixel = backgroundBitmap.GetPixel(x, y);
+                        int diffR = Math.Abs(pixel.R - subtractColor.R);
+                        int diffG = Math.Abs(pixel.G - subtractColor.G);
+                        int diffB = Math.Abs(pixel.B - subtractColor.B);
 
-                                int diffR = Math.Abs(pixel.R - subtractColor.R);
-                                int diffG = Math.Abs(pixel.G - subtractColor.G);
-                                int diffB = Math.Abs(pixel.B - subtractColor.B);
-
-                                double distance = Math.Sqrt(diffR * diffR + diffG * diffG + diffB * diffB);
-                                if (distance > threshold)
-                                    resultBitmap.SetPixel(x, y, pixel);
-                                else
-                                    resultBitmap.SetPixel(x, y, backPixel);
-                            }
-                        }
+                        double distance = Math.Sqrt(diffR * diffR + diffG * diffG + diffB * diffB);
+                        if (distance > threshold)
+                            resultBitmap.SetPixel(x, y, pixel);
+                        else
+                            resultBitmap.SetPixel(x, y, backPixel);
                     }
                 }
+
                 return (Image)resultBitmap;
             }
             catch (Exception ex)
@@ -334,6 +334,21 @@ namespace ImageProcessing
             }
 
             return null;
+        }
+
+        private static Color GetColor()
+        {
+            using (ColorDialog cd = new ColorDialog())
+            {
+                cd.AllowFullOpen = true;
+                cd.ShowHelp = true;
+
+                if (cd.ShowDialog() == DialogResult.OK)
+                {
+                    return cd.Color;
+                }
+            }
+            return Color.Empty;
         }
     }
 }
