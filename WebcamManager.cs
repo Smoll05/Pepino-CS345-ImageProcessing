@@ -33,32 +33,52 @@ namespace ImageProcessing
 
             videoSource = new VideoCaptureDevice(videoDevices[0].MonikerString);
             videoSource.NewFrame += new NewFrameEventHandler(Video_NewFrame);
-
-            startCamera();
+            StartCamera();
         }
 
-        private void Video_NewFrame(object sender, NewFrameEventArgs e)
+        private void Video_NewFrame(object sender, NewFrameEventArgs e) { 
+            if (webcamDisplay.IsDisposed || !webcamDisplay.IsHandleCreated)
+                return; 
+            
+            Bitmap frame = (Bitmap)e.Frame.Clone(); 
+            Bitmap filtered = ImageProcessingService.ApplyWebCamFilter(frame, CurrentFilter); 
+            
+            if (webcamDisplay.IsHandleCreated && !webcamDisplay.IsDisposed) { 
+                webcamDisplay.BeginInvoke((Action)(() => { 
+                    webcamDisplay.Image?.Dispose(); 
+                    webcamDisplay.Image = filtered; 
+                })); 
+            } 
+            else 
+            { 
+                filtered.Dispose(); 
+            } 
+        }
+
+        public void StartCamera()
         {
-            Bitmap frame = (Bitmap)e.Frame.Clone();
+            videoSource?.Start();
+        }
 
-            Bitmap filtered = ImageProcessingService.ApplyWebCamFilter(frame, CurrentFilter);
-
-            webcamDisplay.Invoke((Action)(() =>
+        public void StopCamera()
+        {
+            if (videoSource != null && videoSource.IsRunning)
             {
-                webcamDisplay.Image?.Dispose();
-                webcamDisplay.Image = filtered;
-            }));
-        }
-
-        public void startCamera()
-        {
-            videoSource.Start();
-        }
-
-        public void stopCamera()
-        {
-            videoSource.SignalToStop();
+                videoSource.SignalToStop();
+                videoSource.WaitForStop();
+            }
+            webcamDisplay.Image?.Dispose();
             webcamDisplay.Image = null;
+        }
+
+        public void closeCamera()
+        {
+            if (videoSource != null)
+            {
+                StopCamera();
+                videoSource.NewFrame -= Video_NewFrame;
+                videoSource = null;
+            }
         }
     }
 }

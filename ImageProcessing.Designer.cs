@@ -39,6 +39,7 @@
             inverseToolStripMenuItem = new ToolStripMenuItem();
             histogramToolStripMenuItem = new ToolStripMenuItem();
             sepiaToolStripMenuItem = new ToolStripMenuItem();
+            subtractToolStripMenuItem = new ToolStripMenuItem();
             subtractImageToolStripMenuItem = new ToolStripMenuItem();
             toolToolStripMenuItem = new ToolStripMenuItem();
             normalEditToolStripMenuItem = new ToolStripMenuItem();
@@ -71,7 +72,6 @@
             subtractResultPicture = new PictureBox();
             label6 = new Label();
             subPanel1 = new Panel();
-            subtractToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             imagePanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -146,49 +146,49 @@
             // copyStripMenuItem
             // 
             copyStripMenuItem.Name = "copyStripMenuItem";
-            copyStripMenuItem.Size = new Size(162, 26);
+            copyStripMenuItem.Size = new Size(224, 26);
             copyStripMenuItem.Text = "Copy";
-            copyStripMenuItem.Click += hideIntesnityBar_Click;
             copyStripMenuItem.Click += copyStripMenuItem_Click;
             // 
             // greyscaleToolStripMenuItem
             // 
             greyscaleToolStripMenuItem.Name = "greyscaleToolStripMenuItem";
-            greyscaleToolStripMenuItem.Size = new Size(162, 26);
+            greyscaleToolStripMenuItem.Size = new Size(224, 26);
             greyscaleToolStripMenuItem.Text = "Greyscale";
-            greyscaleToolStripMenuItem.Click += showIntesnityBar_Click;
             greyscaleToolStripMenuItem.Click += greyscaleToolStripMenuItem_Click;
             // 
             // inverseToolStripMenuItem
             // 
             inverseToolStripMenuItem.Name = "inverseToolStripMenuItem";
-            inverseToolStripMenuItem.Size = new Size(162, 26);
+            inverseToolStripMenuItem.Size = new Size(224, 26);
             inverseToolStripMenuItem.Text = "Inverse";
-            inverseToolStripMenuItem.Click += hideIntesnityBar_Click;
             inverseToolStripMenuItem.Click += inverseToolStripMenuItem_Click;
             // 
             // histogramToolStripMenuItem
             // 
             histogramToolStripMenuItem.Name = "histogramToolStripMenuItem";
-            histogramToolStripMenuItem.Size = new Size(162, 26);
+            histogramToolStripMenuItem.Size = new Size(224, 26);
             histogramToolStripMenuItem.Text = "Histogram";
-            histogramToolStripMenuItem.Click += hideIntesnityBar_Click;
             histogramToolStripMenuItem.Click += histogramToolStripMenuItem_Click;
             // 
             // sepiaToolStripMenuItem
             // 
             sepiaToolStripMenuItem.Name = "sepiaToolStripMenuItem";
-            sepiaToolStripMenuItem.Size = new Size(162, 26);
+            sepiaToolStripMenuItem.Size = new Size(224, 26);
             sepiaToolStripMenuItem.Text = "Sepia";
-            sepiaToolStripMenuItem.Click += hideIntesnityBar_Click;
             sepiaToolStripMenuItem.Click += sepiaToolStripMenuItem_Click;
+            // 
+            // subtractToolStripMenuItem
+            // 
+            subtractToolStripMenuItem.Name = "subtractToolStripMenuItem";
+            subtractToolStripMenuItem.Size = new Size(224, 26);
+            subtractToolStripMenuItem.Text = "Subtract";
             // 
             // subtractImageToolStripMenuItem
             // 
             subtractImageToolStripMenuItem.Name = "subtractImageToolStripMenuItem";
             subtractImageToolStripMenuItem.Size = new Size(124, 24);
             subtractImageToolStripMenuItem.Text = "Subtract Image";
-            subtractImageToolStripMenuItem.Click += subtractImageToolStripMenuItem_Click;
             subtractImageToolStripMenuItem.Click += subtractImageToolStripMenuItem_Click;
             // 
             // toolToolStripMenuItem
@@ -201,14 +201,14 @@
             // normalEditToolStripMenuItem
             // 
             normalEditToolStripMenuItem.Name = "normalEditToolStripMenuItem";
-            normalEditToolStripMenuItem.Size = new Size(209, 26);
+            normalEditToolStripMenuItem.Size = new Size(224, 26);
             normalEditToolStripMenuItem.Text = "Normal Edit";
             normalEditToolStripMenuItem.Click += normalEditToolStripMenuItem_Click;
             // 
             // subtractEditToolStripMenuItem
             // 
             subtractEditToolStripMenuItem.Name = "subtractEditToolStripMenuItem";
-            subtractEditToolStripMenuItem.Size = new Size(209, 26);
+            subtractEditToolStripMenuItem.Size = new Size(224, 26);
             subtractEditToolStripMenuItem.Text = "Subtract Edit";
             subtractEditToolStripMenuItem.Click += subtractEditToolStripMenuItem_Click;
             // 
@@ -498,12 +498,6 @@
             subPanel1.Size = new Size(1232, 640);
             subPanel1.TabIndex = 6;
             // 
-            // subtractToolStripMenuItem
-            // 
-            subtractToolStripMenuItem.Name = "subtractToolStripMenuItem";
-            subtractToolStripMenuItem.Size = new Size(224, 26);
-            subtractToolStripMenuItem.Text = "Subtract";
-            // 
             // ImageProcessing
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -517,6 +511,7 @@
             Name = "ImageProcessing";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Image Processing";
+            FormClosing += ImageProcessing_FormClosing;
             Load += Form1_Load;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();

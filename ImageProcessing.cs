@@ -1,4 +1,5 @@
 using System.Windows.Forms;
+using AForge.Video;
 
 namespace ImageProcessing
 {
@@ -23,18 +24,18 @@ namespace ImageProcessing
 
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel1);
-            subtractImageToolStripMenuItem.Visible      = false;
-            loadOriginalToolStripMenuItem.Visible       = false;
-            loadBackgroundToolStripMenuItem.Visible     = false;
-            subtractToolStripMenuItem.Visible           = false;
+            subtractImageToolStripMenuItem.Visible = false;
+            loadOriginalToolStripMenuItem.Visible = false;
+            loadBackgroundToolStripMenuItem.Visible = false;
+            subtractToolStripMenuItem.Visible = false;
 
-            imageManagementService  = new ImageManagementService();
-            webcamManager           = null;
-            hasImageLoaded          = false;
-            hasImageEdited          = false;
-            isCreatingHistogram     = false;
-            isCameraStarted         = false;
-            panelNumberShown        = 1;
+            imageManagementService = new ImageManagementService();
+            webcamManager = null;
+            hasImageLoaded = false;
+            hasImageEdited = false;
+            isCreatingHistogram = false;
+            isCameraStarted = false;
+            panelNumberShown = 1;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -54,7 +55,7 @@ namespace ImageProcessing
         {
             if (panelNumberShown == 3)
             {
-                if(!isCameraStarted)
+                if (!isCameraStarted)
                 {
                     MessageBox.Show("Start the Camera First");
                     return;
@@ -141,8 +142,6 @@ namespace ImageProcessing
                     MessageBox.Show("Start the Camera First");
                     return;
                 }
-
-                MessageBox.Show("gwefoewnfewnfewofnew");
 
                 webcamManager.CurrentFilter = FilterType.Grayscale;
             }
@@ -262,14 +261,14 @@ namespace ImageProcessing
         {
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel1);
-            
-            panelNumberShown                        = 1;
-            subtractImageToolStripMenuItem.Visible  = false;
-            loadOriginalToolStripMenuItem.Visible   = false;
+
+            panelNumberShown = 1;
+            subtractImageToolStripMenuItem.Visible = false;
+            loadOriginalToolStripMenuItem.Visible = false;
             loadBackgroundToolStripMenuItem.Visible = false;
-            editImageToolStripMenuItem.Visible      = true;
-            subtractToolStripMenuItem.Visible       = false;
-            copyStripMenuItem.Visible               = true;
+            editImageToolStripMenuItem.Visible = true;
+            subtractToolStripMenuItem.Visible = false;
+            copyStripMenuItem.Visible = true;
         }
 
         private void subtractEditToolStripMenuItem_Click(object sender, EventArgs e)
@@ -277,12 +276,12 @@ namespace ImageProcessing
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel2);
 
-            panelNumberShown                        = 2;
-            loadOriginalToolStripMenuItem.Visible   = true;
+            panelNumberShown = 2;
+            loadOriginalToolStripMenuItem.Visible = true;
             loadBackgroundToolStripMenuItem.Visible = true;
-            editImageToolStripMenuItem.Visible      = false;
-            subtractImageToolStripMenuItem.Visible  = true;
-            subtractToolStripMenuItem.Visible       = false;
+            editImageToolStripMenuItem.Visible = false;
+            subtractImageToolStripMenuItem.Visible = true;
+            subtractToolStripMenuItem.Visible = false;
         }
 
         private void webcamSubtractToolStripMenuItem_Click(object sender, EventArgs e)
@@ -290,12 +289,12 @@ namespace ImageProcessing
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel3);
 
-            panelNumberShown                        = 3;
-            loadOriginalToolStripMenuItem.Visible   = false;
+            panelNumberShown = 3;
+            loadOriginalToolStripMenuItem.Visible = false;
             loadBackgroundToolStripMenuItem.Visible = false;
-            editImageToolStripMenuItem.Visible      = true;
-            subtractToolStripMenuItem.Visible       = true;
-            copyStripMenuItem.Visible               = false;
+            editImageToolStripMenuItem.Visible = true;
+            subtractToolStripMenuItem.Visible = true;
+            copyStripMenuItem.Visible = false;
         }
 
         private void loadOriginalToolStripMenuItem_Click(object sender, EventArgs e)
@@ -333,16 +332,25 @@ namespace ImageProcessing
 
             if (isCameraStarted)
             {
-                webcamManager.stopCamera();
+                webcamManager.StopCamera();
                 cameraButton.Text = "Start Camera";
             }
             else
             {
-                webcamManager.startCamera();
+                webcamManager.StartCamera();
                 cameraButton.Text = "Stop Camera";
             }
 
             isCameraStarted = !isCameraStarted;
+        }
+
+        private void ImageProcessing_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (webcamManager != null)
+            {
+                webcamManager.closeCamera();
+                webcamManager = null;
+            }
         }
     }
 }
