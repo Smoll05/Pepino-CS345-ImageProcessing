@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ScottPlot.WinForms;
+﻿using ScottPlot.WinForms;
 
 namespace ImageProcessing
 {
@@ -36,7 +31,7 @@ namespace ImageProcessing
             }
         }
 
-        public bool SaveImage(Image editedPictureImage)
+        public bool SaveImage(PictureBox pictureBox)
         {
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
@@ -56,11 +51,7 @@ namespace ImageProcessing
                             case 3: format = System.Drawing.Imaging.ImageFormat.Bmp; break;
                             case 4: format = System.Drawing.Imaging.ImageFormat.Gif; break;
                         }
-
-                        MessageBox.Show(sfd.FileName);
-                        MessageBox.Show(format.ToString());
-                        MessageBox.Show(editedPictureImage.ToString());
-                        editedPictureImage.Save(sfd.FileName, format);
+                        pictureBox.Image.Save(sfd.FileName, format);
                         return true;
                     }
                     catch (Exception ex)

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing.Imaging;
+﻿using System.Drawing.Imaging;
 
 namespace ImageProcessing
 {
@@ -12,7 +6,7 @@ namespace ImageProcessing
     {
         public static Bitmap ApplyWebCamFilter(Bitmap bitmap, FilterType type)
         {
-            switch(type)
+            switch (type)
             {
                 case FilterType.None:
                     return bitmap;
@@ -52,37 +46,6 @@ namespace ImageProcessing
             return null;
         }
 
-        //public static Image GreyScaleImage(Image originalImage, int intensityFactor = 50)
-        //{
-        //    try
-        //    {
-        //        Bitmap originalBitmap = new Bitmap(originalImage);
-        //        Bitmap greyScaleBitmap = new Bitmap(originalBitmap.Width, originalBitmap.Height);
-
-        //        for (int y = 0; y < originalBitmap.Height; y++)
-        //        {
-        //            for (int x = 0; x < originalBitmap.Width; x++)
-        //            {
-        //                Color pixel = originalBitmap.GetPixel(x, y);
-        //                int greyValue = (pixel.R + pixel.G + pixel.B) / 3;
-        //                double scale = intensityFactor / 50.0;
-        //                greyValue = (int)(greyValue * scale);
-        //                greyValue = greyValue > 255 ? 255 : greyValue;
-        //                Color greyPixel = Color.FromArgb(greyValue, greyValue, greyValue);
-        //                greyScaleBitmap.SetPixel(x, y, greyPixel);
-        //            }
-        //        }
-
-        //        return (Image)greyScaleBitmap;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Error applying greyscale: " + ex.Message);
-        //    }
-
-        //    return null;
-        //}
-
         public static Image GreyScaleImage(Image originalImage, int intensityFactor = 50)
         {
             unsafe
@@ -105,18 +68,18 @@ namespace ImageProcessing
                         byte* currentLine = PtrFirstPixel + (y * bitmapData.Stride);
                         for (int x = 0; x < widthInBytes; x += bytesPerPixel)
                         {
-                            int oldBlue     = currentLine[x];
-                            int oldGreen    = currentLine[x + 1];
-                            int oldRed      = currentLine[x + 2];
+                            int oldBlue = currentLine[x];
+                            int oldGreen = currentLine[x + 1];
+                            int oldRed = currentLine[x + 2];
 
-                            int greyValue   = (oldBlue + oldGreen + oldRed) / 3;
-                            double scale    = intensityFactor / 50.0;
-                            greyValue       = (int)(greyValue * scale);
-                            greyValue       = greyValue > 255 ? 255 : greyValue;
+                            int greyValue = (oldBlue + oldGreen + oldRed) / 3;
+                            double scale = intensityFactor / 50.0;
+                            greyValue = (int)(greyValue * scale);
+                            greyValue = greyValue > 255 ? 255 : greyValue;
 
-                            currentLine[x]      = (byte)greyValue;
-                            currentLine[x + 1]  = (byte)greyValue;
-                            currentLine[x + 2]  = (byte)greyValue;
+                            currentLine[x] = (byte)greyValue;
+                            currentLine[x + 1] = (byte)greyValue;
+                            currentLine[x + 2] = (byte)greyValue;
                         }
                     });
                     originalBitmap.UnlockBits(bitmapData);
@@ -131,33 +94,6 @@ namespace ImageProcessing
                 return null;
             }
         }
-
-        //public static Image InvertImage(Image originalImage)
-        //{
-        //    try
-        //    {
-        //        Bitmap originalBitmap = new Bitmap(originalImage);
-        //        Bitmap invertedBitmap = new Bitmap(originalBitmap.Width, originalBitmap.Height);
-
-        //        for (int y = 0; y < originalBitmap.Height; y++)
-        //        {
-        //            for (int x = 0; x < originalBitmap.Width; x++)
-        //            {
-        //                Color pixel = originalBitmap.GetPixel(x, y);
-        //                Color greyPixel = Color.FromArgb(255 - pixel.R, 255 - pixel.G, 255 - pixel.B);
-        //                invertedBitmap.SetPixel(x, y, greyPixel);
-        //            }
-        //        }
-
-        //        return (Image)invertedBitmap;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Error inverting image: " + ex.Message);
-        //    }
-
-        //    return null;
-        //}
 
         public static Image InvertImage(Image originalImage)
         {
@@ -253,42 +189,6 @@ namespace ImageProcessing
 
             return false;
         }
-
-        //public static Image SepiaImage(Image originalImage)
-        //{
-
-        //    try
-        //    {
-        //        Bitmap originalBitmap = new Bitmap(originalImage);
-        //        Bitmap sepiaBitmap = new Bitmap(originalBitmap.Width, originalBitmap.Height);
-
-        //        for (int y = 0; y < originalBitmap.Height; y++)
-        //        {
-        //            for (int x = 0; x < originalBitmap.Width; x++)
-        //            {
-        //                Color pixel = originalBitmap.GetPixel(x, y);
-
-        //                int sepiaRed = (int)(.393 * pixel.R + .769 * pixel.G + .189 * pixel.B);
-        //                int sepiaGreen = (int)(.349 * pixel.R + .686 * pixel.G + .168 * pixel.B);
-        //                int sepiaBlue = (int)(.272 * pixel.R + .534 * pixel.G + .131 * pixel.B);
-
-        //                sepiaRed = sepiaRed > 255 ? 255 : sepiaRed;
-        //                sepiaGreen = sepiaGreen > 255 ? 255 : sepiaGreen;
-        //                sepiaBlue = sepiaBlue > 255 ? 255 : sepiaBlue;
-
-        //                Color greyPixel = Color.FromArgb(sepiaRed, sepiaGreen, sepiaBlue);
-        //                sepiaBitmap.SetPixel(x, y, greyPixel);
-        //            }
-        //        }
-
-        //        return (Image)sepiaBitmap;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Error inverting image: " + ex.Message);
-        //    }
-        //    return null;
-        //}
 
         public static Image SepiaImage(Image originalImage)
         {
