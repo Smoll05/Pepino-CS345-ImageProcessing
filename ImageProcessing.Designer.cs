@@ -159,6 +159,8 @@
             copyStripMenuItem.Size = new Size(162, 26);
             copyStripMenuItem.Text = "Copy";
             copyStripMenuItem.Click += copyStripMenuItem_Click;
+            copyStripMenuItem.Click += hideIntesnityBar_Click;
+            copyStripMenuItem.Click += hideHistogramChart_Click;
             // 
             // greyscaleToolStripMenuItem
             // 
@@ -166,6 +168,8 @@
             greyscaleToolStripMenuItem.Size = new Size(162, 26);
             greyscaleToolStripMenuItem.Text = "Greyscale";
             greyscaleToolStripMenuItem.Click += greyscaleToolStripMenuItem_Click;
+            greyscaleToolStripMenuItem.Click += showIntesnityBar_Click;
+            greyscaleToolStripMenuItem.Click += hideHistogramChart_Click;
             // 
             // inverseToolStripMenuItem
             // 
@@ -173,6 +177,8 @@
             inverseToolStripMenuItem.Size = new Size(162, 26);
             inverseToolStripMenuItem.Text = "Inverse";
             inverseToolStripMenuItem.Click += inverseToolStripMenuItem_Click;
+            inverseToolStripMenuItem.Click += hideIntesnityBar_Click;
+            inverseToolStripMenuItem.Click += hideHistogramChart_Click;
             // 
             // histogramToolStripMenuItem
             // 
@@ -180,6 +186,8 @@
             histogramToolStripMenuItem.Size = new Size(162, 26);
             histogramToolStripMenuItem.Text = "Histogram";
             histogramToolStripMenuItem.Click += histogramToolStripMenuItem_Click;
+            histogramToolStripMenuItem.Click += hideIntesnityBar_Click;
+            histogramToolStripMenuItem.Click += showHistogramChart_Click;
             // 
             // sepiaToolStripMenuItem
             // 
@@ -187,6 +195,8 @@
             sepiaToolStripMenuItem.Size = new Size(162, 26);
             sepiaToolStripMenuItem.Text = "Sepia";
             sepiaToolStripMenuItem.Click += sepiaToolStripMenuItem_Click;
+            sepiaToolStripMenuItem.Click += hideIntesnityBar_Click;
+            sepiaToolStripMenuItem.Click += hideHistogramChart_Click;
             // 
             // subtractToolStripMenuItem
             // 
@@ -378,7 +388,7 @@
             // 
             // mainPanel
             // 
-            mainPanel.Controls.Add(subPanel3);
+            mainPanel.Controls.Add(subPanel1);
             mainPanel.Location = new Point(18, 31);
             mainPanel.Name = "mainPanel";
             mainPanel.Size = new Size(1232, 640);

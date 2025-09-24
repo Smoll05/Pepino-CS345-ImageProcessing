@@ -311,7 +311,7 @@ namespace ImageProcessing
 
 
         /*
-         *  Greyscale Intensity Bar Calls
+         *  UI Calls
          */
         private void intensityBar_Scroll(object sender, EventArgs e)
         {
@@ -349,6 +349,7 @@ namespace ImageProcessing
         {
             histogramPanel.Visible = false;
             resultImagePanel.Visible = true;
+            isCreatingHistogram = false;
         }
 
         private void subtractImageToolStripMenuItem_Click(object sender, EventArgs e)
