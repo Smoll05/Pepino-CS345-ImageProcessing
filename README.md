@@ -50,4 +50,4 @@ This project demonstrates common image editing techniques and basic webcam integ
 
 ---
 
-Would you like me to also include **build instructions for developers** (how they can clone your repo and run it in Visual Studio)? This is common for open-source projects.
+Made with ❤️ by Carl Angelo T. Pepino - BSCS-3 @ CIT-U
