@@ -75,7 +75,7 @@ namespace ImageProcessing
                             int greyValue = (oldBlue + oldGreen + oldRed) / 3;
                             double scale = intensityFactor / 50.0;
                             greyValue = (int)(greyValue * scale);
-                            greyValue = greyValue > 255 ? 255 : greyValue;
+                            greyValue = Utils.Clamp(greyValue, 0, 255);
 
                             currentLine[x] = (byte)greyValue;
                             currentLine[x + 1] = (byte)greyValue;
@@ -249,19 +249,6 @@ namespace ImageProcessing
             return SubtractWithFullColor(image, backgroundImage);
         }
 
-        private static Bitmap ResizeBitmap(Image original, int newWidth, int newHeight)
-        {
-            Bitmap resized = new Bitmap(newWidth, newHeight);
-
-            using (Graphics g = Graphics.FromImage(resized))
-            {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.DrawImage(original, 0, 0, newWidth, newHeight);
-            }
-
-            return resized;
-        }
-
         private static Image SubtractWithGrey(Image image, Image backgroundImage)
         {
             try
@@ -279,11 +266,11 @@ namespace ImageProcessing
 
                     if (originalArea > backgroundArea)
                     {
-                        imageBitmap = ResizeBitmap(imageBitmap, backgroundBitmap.Width, backgroundBitmap.Height);
+                        imageBitmap = Utils.ResizeBitmap(imageBitmap, backgroundBitmap.Width, backgroundBitmap.Height);
                     }
                     else
                     {
-                        backgroundBitmap = ResizeBitmap(backgroundBitmap, imageBitmap.Width, imageBitmap.Height);
+                        backgroundBitmap = Utils.ResizeBitmap(backgroundBitmap, imageBitmap.Width, imageBitmap.Height);
                     }
                 }
 
@@ -296,7 +283,7 @@ namespace ImageProcessing
 
                 Bitmap resultBitmap = new Bitmap(imageBitmap.Width, imageBitmap.Height);
 
-                Color subtractColor = GetColor();
+                Color subtractColor = Utils.GetColor();
                 int greySubtractValue = (subtractColor.R + subtractColor.G + subtractColor.B) / 3;
                 int threshold = 5;
 
@@ -341,11 +328,11 @@ namespace ImageProcessing
 
                     if (originalArea > backgroundArea)
                     {
-                        imageBitmap = ResizeBitmap(imageBitmap, backgroundBitmap.Width, backgroundBitmap.Height);
+                        imageBitmap = Utils.ResizeBitmap(imageBitmap, backgroundBitmap.Width, backgroundBitmap.Height);
                     }
                     else
                     {
-                        backgroundBitmap = ResizeBitmap(backgroundBitmap, imageBitmap.Width, imageBitmap.Height);
+                        backgroundBitmap = Utils.ResizeBitmap(backgroundBitmap, imageBitmap.Width, imageBitmap.Height);
                     }
                 }
 
@@ -358,7 +345,7 @@ namespace ImageProcessing
 
                 Bitmap resultBitmap = new Bitmap(imageBitmap.Width, imageBitmap.Height);
 
-                Color subtractColor = GetColor();
+                Color subtractColor = Utils.GetColor();
                 int threshold = 150;
 
                 for (int x = 0; x < imageBitmap.Width; x++)
@@ -388,21 +375,6 @@ namespace ImageProcessing
             }
 
             return null;
-        }
-
-        private static Color GetColor()
-        {
-            using (ColorDialog cd = new ColorDialog())
-            {
-                cd.AllowFullOpen = true;
-                cd.ShowHelp = true;
-
-                if (cd.ShowDialog() == DialogResult.OK)
-                {
-                    return cd.Color;
-                }
-            }
-            return Color.Empty;
         }
     }
 }
