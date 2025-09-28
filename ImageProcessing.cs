@@ -328,28 +328,52 @@ namespace ImageProcessing
             }
         }
 
-        private void hideIntesnityBar_Click(object sender, EventArgs e)
-        {
-            intensityBarPanel.Visible = false;
-        }
-
         private void showIntesnityBar_Click(object sender, EventArgs e)
         {
-            intensityBar.Value = 50;
-            intensityBarPanel.Visible = true;
+            ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
+            string filterName = clickedItem.Text;
+
+            switch (filterName)
+            {
+                case "Greyscale":
+                case "Smooth":
+                case "Gaussian Blur":
+                case "Sharpen":
+                case "Mean Removal":
+                case "Laplacian":
+                case "Horizontal / Vertical":
+                case "All Directoins":
+                case "Lossy":
+                case "Horizontal":
+                case "Vertical":
+                    intensityBar.Value = 50;
+                    intensityBarPanel.Visible = true;
+                    break;
+
+                default:
+                    intensityBarPanel.Visible = false;
+                    break;
+            }
         }
 
         private void showHistogramChart_Click(object sender, EventArgs e)
         {
-            histogramPanel.Visible = true;
-            resultImagePanel.Visible = false;
-        }
+            ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
+            string filterName = clickedItem.Text;
 
-        private void hideHistogramChart_Click(object sender, EventArgs e)
-        {
-            histogramPanel.Visible = false;
-            resultImagePanel.Visible = true;
-            isCreatingHistogram = false;
+            if (filterName != "Histogram")
+            {
+                histogramPanel.Visible = false;
+                resultImagePanel.Visible = true;
+                isCreatingHistogram = false;
+                return;
+            }
+            else
+            {
+                histogramPanel.Visible = true;
+                resultImagePanel.Visible = false;
+                isCreatingHistogram = true;
+            }
         }
 
         private void subtractImageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -406,6 +430,176 @@ namespace ImageProcessing
             }
 
             webcamManager.CurrentFilter = FilterType.None;
+        }
+
+        private void smoothToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.Smooth(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void gaussianBlurToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.GaussianBlur(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void sharpenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.Sharpen(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void meanRemovalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.MeanRemoval(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void laplacianToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.EmbossLaplascian(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void horizontalVerticalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.EmbossHorizontalAndVertical(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void allDirectionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.EmbossAll(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void lossyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.EmbossLossy(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void horizontalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.EmbossHorizontal(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        private void verticalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded)
+            {
+                MessageBox.Show("Load An Image First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.EmbossVertical(originalImagePicture.Image);
+            if (editedImage != null)
+            {
+                editedImagePicture.Image = editedImage;
+                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
         }
     }
 }
