@@ -1,3 +1,5 @@
+using ScottPlot.TickGenerators.TimeUnits;
+
 namespace ImageProcessing
 {
     public partial class ImageProcessing : Form
@@ -15,6 +17,9 @@ namespace ImageProcessing
         // 3 - WebCam Subtract
         int panelNumberShown;
 
+        public static FilterType CurrentImageFilter { get; set; } = FilterType.None;
+        public static FilterType CurrentCamFilter { get; set; } = FilterType.None;
+
         public ImageProcessing()
         {
             InitializeComponent();
@@ -22,7 +27,6 @@ namespace ImageProcessing
             cameraComboBox.Items.Insert(0, "-- None --");
             cameraComboBox.SelectedIndex = 0;
             cameraComboBox.SelectedIndexChanged += cameraComboBox_SelectedIndexChanged;
-
 
             mainPanel.Controls.Clear();
             mainPanel.Controls.Add(subPanel1);
@@ -49,6 +53,12 @@ namespace ImageProcessing
             var cameras = webcamManager.GetAvailableCameras();
             cameraComboBox.Items.AddRange(cameras.ToArray());
         }
+
+        private void subPanel3_VisibleChange(object sender, EventArgs e)
+        {
+            webcamDisplay.Image = null;
+        }
+
         private void ImageProcessing_FormClosing(object sender, FormClosingEventArgs e)
         {
             webcamManager.closeCamera();
@@ -133,6 +143,7 @@ namespace ImageProcessing
                 editedImagePicture.Image = editedImage;
                 editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
                 hasImageEdited = true;
+                CurrentImageFilter = FilterType.Copy;
             }
         }
 
@@ -152,6 +163,7 @@ namespace ImageProcessing
                     editedImagePicture.Image = editedImage;
                     editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
                     hasImageEdited = true;
+                    CurrentImageFilter = FilterType.Grayscale;
                 }
             }
             else if (panelNumberShown == 3)
@@ -162,7 +174,7 @@ namespace ImageProcessing
                     return;
                 }
 
-                webcamManager.CurrentFilter = FilterType.Grayscale;
+                CurrentCamFilter = FilterType.Grayscale;
             }
         }
 
@@ -183,6 +195,8 @@ namespace ImageProcessing
                     editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
                     hasImageEdited = true;
                 }
+
+                CurrentImageFilter = FilterType.Invert;
             }
             else if (panelNumberShown == 3)
             {
@@ -192,7 +206,7 @@ namespace ImageProcessing
                     return;
                 }
 
-                webcamManager.CurrentFilter = FilterType.Invert;
+                CurrentCamFilter = FilterType.Invert;
             }
         }
 
@@ -224,6 +238,7 @@ namespace ImageProcessing
                     editedImagePicture.Image = editedImage;
                     editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
                     hasImageEdited = true;
+                    CurrentImageFilter = FilterType.Sepia;
                 }
             }
             else if (panelNumberShown == 3)
@@ -234,7 +249,7 @@ namespace ImageProcessing
                     return;
                 }
 
-                webcamManager.CurrentFilter = FilterType.Sepia;
+                CurrentCamFilter = FilterType.Sepia;
             }
         }
         private void loadOriginalToolStripMenuItem_Click(object sender, EventArgs e)
@@ -318,7 +333,8 @@ namespace ImageProcessing
             int intensityFactor = intensityBar.Value;
             if (hasImageLoaded)
             {
-                Image editedImage = ImageProcessingService.GreyScaleImage(originalImagePicture.Image, intensityFactor);
+                Bitmap bitmap = new Bitmap(originalImagePicture.Image);
+                Image editedImage = (Image)ImageProcessingService.GreyScaleImage(bitmap, intensityFactor);
                 if (editedImage != null)
                 {
                     editedImagePicture.Image = editedImage;
@@ -333,26 +349,14 @@ namespace ImageProcessing
             ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
             string filterName = clickedItem.Text;
 
-            switch (filterName)
+            if (filterName == "Greyscale")
             {
-                case "Greyscale":
-                case "Smooth":
-                case "Gaussian Blur":
-                case "Sharpen":
-                case "Mean Removal":
-                case "Laplacian":
-                case "Horizontal / Vertical":
-                case "All Directoins":
-                case "Lossy":
-                case "Horizontal":
-                case "Vertical":
-                    intensityBar.Value = 50;
-                    intensityBarPanel.Visible = true;
-                    break;
-
-                default:
-                    intensityBarPanel.Visible = false;
-                    break;
+                intensityBar.Value = 50;
+                intensityBarPanel.Visible = true;
+            }
+            else
+            {
+                intensityBarPanel.Visible = false;
             }
         }
 
@@ -396,7 +400,6 @@ namespace ImageProcessing
         /*
          *  Camera Calls
          */
-
         private void cameraButton_Click(object sender, EventArgs e)
         {
             if (isCameraStarted)
@@ -404,6 +407,12 @@ namespace ImageProcessing
                 webcamManager.StopCamera();
                 cameraButton.Text = "Start Camera";
                 isCameraStarted = false;
+
+                if (webcamDisplay.Image != null)
+                {
+                    webcamDisplay.Image.Dispose();
+                    webcamDisplay.Image = null;
+                }
             }
             else
             {
@@ -429,176 +438,316 @@ namespace ImageProcessing
                 return;
             }
 
-            webcamManager.CurrentFilter = FilterType.None;
+            CurrentCamFilter = FilterType.None;
         }
 
         private void smoothToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.Smooth(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.Smooth(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.Smooth;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.Smooth;
             }
         }
 
         private void gaussianBlurToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.GaussianBlur(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.GaussianBlur(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.GaussianBlur;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.GaussianBlur;
             }
         }
 
         private void sharpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.Sharpen(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.Sharpen(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.Sharpen;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.Sharpen;
             }
         }
 
         private void meanRemovalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.MeanRemoval(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.MeanRemoval(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.MeanRemoval;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.MeanRemoval;
             }
         }
 
         private void laplacianToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.EmbossLaplascian(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.EmbossLaplascian(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.EmbossLaplascian;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.EmbossLaplascian;
             }
         }
 
         private void horizontalVerticalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.EmbossHorizontalAndVertical(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.EmbossHorizontalAndVertical(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.EmbossHorizontalVertical;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.EmbossHorizontalVertical;
             }
         }
 
         private void allDirectionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.EmbossAll(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.EmbossAll(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.EmbossAll;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.EmbossAll;
             }
         }
 
         private void lossyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.EmbossLossy(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.EmbossLossy(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.EmbossLossy;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.EmbossLossy;
             }
         }
 
         private void horizontalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.EmbossHorizontal(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.EmbossHorizontal(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.EmbossHorizontal;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.EmbossHorizontal;
             }
         }
 
         private void verticalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!hasImageLoaded)
+            if (panelNumberShown == 1)
             {
-                MessageBox.Show("Load An Image First!");
-                return;
-            }
+                if (!hasImageLoaded)
+                {
+                    MessageBox.Show("Load An Image First!");
+                    return;
+                }
 
-            Image editedImage = ImageProcessingService.EmbossVertical(originalImagePicture.Image);
-            if (editedImage != null)
+                Image editedImage = ImageProcessingService.EmbossVertical(originalImagePicture.Image);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                    CurrentImageFilter = FilterType.EmbossVertical;
+                }
+            }
+            else if (panelNumberShown == 3)
             {
-                editedImagePicture.Image = editedImage;
-                editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
+                if (!isCameraStarted)
+                {
+                    MessageBox.Show("Start the Camera First");
+                    return;
+                }
+
+                CurrentCamFilter = FilterType.EmbossVertical;
             }
         }
     }

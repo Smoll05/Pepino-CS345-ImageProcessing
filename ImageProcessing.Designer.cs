@@ -524,6 +524,7 @@
             subPanel3.Name = "subPanel3";
             subPanel3.Size = new Size(1232, 640);
             subPanel3.TabIndex = 7;
+            subPanel3.VisibleChanged += subPanel3_VisibleChange;
             // 
             // label9
             // 

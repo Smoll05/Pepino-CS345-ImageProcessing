@@ -1,4 +1,5 @@
-﻿using AForge.Video;
+﻿using System.Threading;
+using AForge.Video;
 using AForge.Video.DirectShow;
 
 namespace ImageProcessing
@@ -8,8 +9,6 @@ namespace ImageProcessing
         private FilterInfoCollection videoDevices;
         private VideoCaptureDevice videoSource;
         private PictureBox webcamDisplay;
-
-        public FilterType CurrentFilter { get; set; } = FilterType.None;
 
         public WebcamManager(PictureBox webcamDisplay)
         {
@@ -34,7 +33,6 @@ namespace ImageProcessing
             }
 
             videoSource = new VideoCaptureDevice(selectedDevice.MonikerString);
-            videoSource.NewFrame += new NewFrameEventHandler(Video_NewFrame);
         }
 
         private void Video_NewFrame(object sender, NewFrameEventArgs e)
@@ -43,7 +41,7 @@ namespace ImageProcessing
                 return;
 
             Bitmap frame = (Bitmap)e.Frame.Clone();
-            Bitmap filtered = ImageProcessingService.ApplyWebCamFilter(frame, CurrentFilter);
+            Bitmap filtered = ImageProcessingService.ApplyImageFilter(frame, ImageProcessing.CurrentCamFilter);
 
             if (webcamDisplay.IsHandleCreated && !webcamDisplay.IsDisposed)
             {
@@ -61,6 +59,7 @@ namespace ImageProcessing
 
         public bool StartCamera()
         {
+            videoSource.NewFrame += new NewFrameEventHandler(Video_NewFrame); ;
             if (videoSource != null)
             {
                 videoSource.Start();
@@ -75,14 +74,22 @@ namespace ImageProcessing
 
         public void StopCamera()
         {
-            if (videoSource != null && videoSource.IsRunning)
+            if (videoSource != null)
             {
-                videoSource.SignalToStop();
-                videoSource.WaitForStop();
+                videoSource.NewFrame -= Video_NewFrame;
+
+                if (videoSource.IsRunning)
+                {
+                    videoSource.SignalToStop();
+                    videoSource.WaitForStop();
+
+                }
+
+                webcamDisplay.Image?.Dispose();
+                webcamDisplay.Image = null;
             }
-            webcamDisplay.Image?.Dispose();
-            webcamDisplay.Image = null;
         }
+
 
         public void closeCamera()
         {

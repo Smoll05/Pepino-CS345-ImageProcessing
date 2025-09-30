@@ -4,8 +4,9 @@ namespace ImageProcessing
 {
     internal static class ImageProcessingService
     {
-        public static Bitmap ApplyWebCamFilter(Bitmap bitmap, FilterType type)
+        public static Bitmap ApplyImageFilter(Bitmap bitmap, FilterType type, int intensityValue = 50)
         {
+            double factor = (int)(intensityValue / 50.0);
             switch (type)
             {
                 case FilterType.None:
@@ -16,10 +17,69 @@ namespace ImageProcessing
                     return (Bitmap)InvertImage(bitmap);
                 case FilterType.Sepia:
                     return (Bitmap)SepiaImage(bitmap);
+                case FilterType.Smooth:
+                    return (Bitmap)Smooth(bitmap);
+                case FilterType.GaussianBlur:
+                    return (Bitmap)GaussianBlur(bitmap, 20);
+                case FilterType.Sharpen:
+                    return (Bitmap)Sharpen(bitmap);
+                case FilterType.MeanRemoval:
+                    return (Bitmap)MeanRemoval(bitmap);
+                case FilterType.EmbossLaplascian:
+                    return (Bitmap)EmbossLaplascian(bitmap);
+                case FilterType.EmbossHorizontalVertical:
+                    return (Bitmap)EmbossHorizontalAndVertical(bitmap);
+                case FilterType.EmbossAll:
+                    return (Bitmap)EmbossAll(bitmap);
+                case FilterType.EmbossLossy:
+                    return (Bitmap)EmbossLossy(bitmap);
+                case FilterType.EmbossHorizontal:
+                    return (Bitmap)EmbossHorizontal(bitmap);
+                case FilterType.EmbossVertical:
+                    return (Bitmap)EmbossVertical(bitmap);
                 default:
                     return bitmap;
             }
         }
+
+        //public static Bitmap ApplyImageFilter(Bitmap bitmap, FilterType type, int intensityValue = 50)
+        //{
+        //    double factor = (int)(intensityValue / 50.0);
+        //    switch (type)
+        //    {
+        //        case FilterType.None:
+        //            return bitmap;
+        //        case FilterType.Grayscale:
+        //            return (Bitmap)GreyScaleImage(bitmap, factor);
+        //        case FilterType.Invert:
+        //            return (Bitmap)InvertImage(bitmap);
+        //        case FilterType.Sepia:
+        //            return (Bitmap)SepiaImage(bitmap);
+        //        case FilterType.Smooth:
+        //            return (Bitmap)Smooth(bitmap, factor);
+        //        case FilterType.GaussianBlur:
+        //            return (Bitmap)GaussianBlur(bitmap, factor);
+        //        case FilterType.Sharpen:
+        //            return (Bitmap)Sharpen(bitmap, factor);
+        //        case FilterType.MeanRemoval:
+        //            return (Bitmap)MeanRemoval(bitmap, factor);
+        //        case FilterType.EmbossLaplascian:
+        //            return (Bitmap)EmbossLaplascian(bitmap, factor);
+        //        case FilterType.EmbossHorizontalVertical:
+        //            return (Bitmap)EmbossHorizontalAndVertical(bitmap, factor);
+        //        case FilterType.EmbossAll:
+        //            return (Bitmap)EmbossAll(bitmap, factor);
+        //        case FilterType.EmbossLossy:
+        //            return (Bitmap)EmbossLossy(bitmap, factor);
+        //        case FilterType.EmbossHorizontal:
+        //            return (Bitmap)EmbossHorizontal(bitmap, factor);
+        //        case FilterType.EmbossVertical:
+        //            return (Bitmap)EmbossVertical(bitmap, factor);
+        //        default:
+        //            return bitmap;
+        //    }
+        //}
+
         public static Image CopyImage(Image originalImage)
         {
             try
@@ -46,7 +106,7 @@ namespace ImageProcessing
             return null;
         }
 
-        public static Image GreyScaleImage(Image originalImage, int intensityFactor = 50)
+        public static Image GreyScaleImage(Image originalImage, double intensityFactor = 50)
         {
             unsafe
             {
@@ -75,7 +135,7 @@ namespace ImageProcessing
                             int greyValue = (oldBlue + oldGreen + oldRed) / 3;
                             double scale = intensityFactor / 50.0;
                             greyValue = (int)(greyValue * scale);
-                            greyValue = Utils.Clamp(greyValue, 0, 255);
+                            greyValue = greyValue > 255 ? 255 : greyValue;
 
                             currentLine[x] = (byte)greyValue;
                             currentLine[x + 1] = (byte)greyValue;
@@ -438,7 +498,7 @@ namespace ImageProcessing
             ConvMatrix m = new ConvMatrix();
             m.Set(
                 0, -1, 0,
-                0, nWeight, 0,
+                -1, nWeight, -1,
                 0, -1, 0,
                 nWeight - 3, 127
             );
@@ -482,6 +542,7 @@ namespace ImageProcessing
             Bitmap bitmap = new Bitmap(image);
             return Conv3x3(bitmap, m);
         }
+
         public static Image EmbossVertical(Image image, int nWeight = 0)
         {
             ConvMatrix m = new ConvMatrix();
@@ -498,7 +559,10 @@ namespace ImageProcessing
         private static Image Conv3x3(Bitmap b, ConvMatrix m)
         {
             if (0 == m.Factor)
+            {
+                MessageBox.Show("Error: Conv3x3 factor must not be zero");
                 return null;
+            }
 
             Bitmap bSrc = (Bitmap)b.Clone();
 
@@ -587,11 +651,6 @@ namespace ImageProcessing
                         p += 3;
                         pSrc += 3;
                     }
-
-                    // Skip the padding bytes at the end of each line
-                    // Moves to the next row
-                    p += nOffset;
-                    pSrc += nOffset;
                 }
             }
 
@@ -600,7 +659,6 @@ namespace ImageProcessing
             bSrc.UnlockBits(bmSrc);
 
             return (Image)b;
-
         }
     }
 }
