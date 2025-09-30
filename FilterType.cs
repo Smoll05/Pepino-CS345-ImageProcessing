@@ -7,6 +7,16 @@
         Grayscale,
         Sepia,
         Invert,
-        Subtract
+        Subtract,
+        Smooth,
+        GaussianBlur,
+        Sharpen,
+        MeanRemoval,
+        EmbossLaplascian,
+        EmbossHorizontalVertical,
+        EmbossAll,
+        EmbossLossy,
+        EmbossHorizontal,
+        EmbossVertical
     }
 }
