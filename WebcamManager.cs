@@ -82,7 +82,6 @@ namespace ImageProcessing
                 {
                     videoSource.SignalToStop();
                     videoSource.WaitForStop();
-
                 }
 
                 webcamDisplay.Image?.Dispose();
