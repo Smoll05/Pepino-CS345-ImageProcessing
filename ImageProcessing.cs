@@ -324,123 +324,6 @@ namespace ImageProcessing
             noneToolStripMenuItem.Visible = true;
         }
 
-
-        /*
-         *  UI Calls
-         */
-        private void intensityBar_Scroll(object sender, EventArgs e)
-        {
-            int intensityFactor = intensityBar.Value;
-            if (hasImageLoaded)
-            {
-                Bitmap bitmap = new Bitmap(originalImagePicture.Image);
-                Image editedImage = (Image)ImageProcessingService.GreyScaleImage(bitmap, intensityFactor);
-                if (editedImage != null)
-                {
-                    editedImagePicture.Image = editedImage;
-                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
-                    hasImageEdited = true;
-                }
-            }
-        }
-
-        private void showIntesnityBar_Click(object sender, EventArgs e)
-        {
-            ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
-            string filterName = clickedItem.Text;
-
-            if (filterName == "Greyscale")
-            {
-                intensityBar.Value = 50;
-                intensityBarPanel.Visible = true;
-            }
-            else
-            {
-                intensityBarPanel.Visible = false;
-            }
-        }
-
-        private void showHistogramChart_Click(object sender, EventArgs e)
-        {
-            ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
-            string filterName = clickedItem.Text;
-
-            if (filterName != "Histogram")
-            {
-                histogramPanel.Visible = false;
-                resultImagePanel.Visible = true;
-                isCreatingHistogram = false;
-                return;
-            }
-            else
-            {
-                histogramPanel.Visible = true;
-                resultImagePanel.Visible = false;
-                isCreatingHistogram = true;
-            }
-        }
-
-        private void subtractImageToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!hasImageLoaded || !hasBackgroundLoaded)
-            {
-                MessageBox.Show("Load Both An Image And A Background First!");
-                return;
-            }
-
-            Image editedImage = ImageProcessingService.SubtractImage(subtractImagePicture.Image, subtractBackgroundPicture.Image);
-            if (editedImage != null)
-            {
-                subtractResultPicture.Image = editedImage;
-                subtractResultPicture.SizeMode = PictureBoxSizeMode.Zoom;
-                hasImageEdited = true;
-            }
-        }
-
-        /*
-         *  Camera Calls
-         */
-        private void cameraButton_Click(object sender, EventArgs e)
-        {
-            if (isCameraStarted)
-            {
-                webcamManager.StopCamera();
-                cameraButton.Text = "Start Camera";
-                isCameraStarted = false;
-
-                if (webcamDisplay.Image != null)
-                {
-                    webcamDisplay.Image.Dispose();
-                    webcamDisplay.Image = null;
-                }
-            }
-            else
-            {
-                if (isCameraStarted = webcamManager.StartCamera())
-                    cameraButton.Text = "Stop Camera";
-            }
-        }
-
-        private void cameraComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            webcamManager.StopCamera();
-            cameraButton.Text = "Start Camera";
-            webcamManager.InitializeCamera(cameraComboBox.Text);
-        }
-
-
-        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-            if (!isCameraStarted)
-            {
-                MessageBox.Show("Start the Camera First");
-                return;
-            }
-
-            CurrentCamFilter = FilterType.None;
-        }
-
         private void smoothToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (panelNumberShown == 1)
@@ -749,6 +632,123 @@ namespace ImageProcessing
 
                 CurrentCamFilter = FilterType.EmbossVertical;
             }
+        }
+
+
+        /*
+         *  UI Calls
+         */
+        private void intensityBar_Scroll(object sender, EventArgs e)
+        {
+            int intensityFactor = intensityBar.Value;
+            if (hasImageLoaded)
+            {
+                Bitmap bitmap = new Bitmap(originalImagePicture.Image);
+                Image editedImage = (Image)ImageProcessingService.GreyScaleImage(bitmap, intensityFactor);
+                if (editedImage != null)
+                {
+                    editedImagePicture.Image = editedImage;
+                    editedImagePicture.SizeMode = PictureBoxSizeMode.Zoom;
+                    hasImageEdited = true;
+                }
+            }
+        }
+
+        private void showIntesnityBar_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
+            string filterName = clickedItem.Text;
+
+            if (filterName == "Greyscale")
+            {
+                intensityBar.Value = 50;
+                intensityBarPanel.Visible = true;
+            }
+            else
+            {
+                intensityBarPanel.Visible = false;
+            }
+        }
+
+        private void showHistogramChart_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
+            string filterName = clickedItem.Text;
+
+            if (filterName != "Histogram")
+            {
+                histogramPanel.Visible = false;
+                resultImagePanel.Visible = true;
+                isCreatingHistogram = false;
+                return;
+            }
+            else
+            {
+                histogramPanel.Visible = true;
+                resultImagePanel.Visible = false;
+                isCreatingHistogram = true;
+            }
+        }
+
+        private void subtractImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!hasImageLoaded || !hasBackgroundLoaded)
+            {
+                MessageBox.Show("Load Both An Image And A Background First!");
+                return;
+            }
+
+            Image editedImage = ImageProcessingService.SubtractImage(subtractImagePicture.Image, subtractBackgroundPicture.Image);
+            if (editedImage != null)
+            {
+                subtractResultPicture.Image = editedImage;
+                subtractResultPicture.SizeMode = PictureBoxSizeMode.Zoom;
+                hasImageEdited = true;
+            }
+        }
+
+        /*
+         *  Camera Calls
+         */
+        private void cameraButton_Click(object sender, EventArgs e)
+        {
+            if (isCameraStarted)
+            {
+                webcamManager.StopCamera();
+                cameraButton.Text = "Start Camera";
+                isCameraStarted = false;
+
+                if (webcamDisplay.Image != null)
+                {
+                    webcamDisplay.Image.Dispose();
+                    webcamDisplay.Image = null;
+                }
+            }
+            else
+            {
+                if (isCameraStarted = webcamManager.StartCamera())
+                    cameraButton.Text = "Stop Camera";
+            }
+        }
+
+        private void cameraComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            webcamManager.StopCamera();
+            cameraButton.Text = "Start Camera";
+            webcamManager.InitializeCamera(cameraComboBox.Text);
+        }
+
+
+        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (!isCameraStarted)
+            {
+                MessageBox.Show("Start the Camera First");
+                return;
+            }
+
+            CurrentCamFilter = FilterType.None;
         }
     }
 }

@@ -42,44 +42,6 @@ namespace ImageProcessing
             }
         }
 
-        //public static Bitmap ApplyImageFilter(Bitmap bitmap, FilterType type, int intensityValue = 50)
-        //{
-        //    double factor = (int)(intensityValue / 50.0);
-        //    switch (type)
-        //    {
-        //        case FilterType.None:
-        //            return bitmap;
-        //        case FilterType.Grayscale:
-        //            return (Bitmap)GreyScaleImage(bitmap, factor);
-        //        case FilterType.Invert:
-        //            return (Bitmap)InvertImage(bitmap);
-        //        case FilterType.Sepia:
-        //            return (Bitmap)SepiaImage(bitmap);
-        //        case FilterType.Smooth:
-        //            return (Bitmap)Smooth(bitmap, factor);
-        //        case FilterType.GaussianBlur:
-        //            return (Bitmap)GaussianBlur(bitmap, factor);
-        //        case FilterType.Sharpen:
-        //            return (Bitmap)Sharpen(bitmap, factor);
-        //        case FilterType.MeanRemoval:
-        //            return (Bitmap)MeanRemoval(bitmap, factor);
-        //        case FilterType.EmbossLaplascian:
-        //            return (Bitmap)EmbossLaplascian(bitmap, factor);
-        //        case FilterType.EmbossHorizontalVertical:
-        //            return (Bitmap)EmbossHorizontalAndVertical(bitmap, factor);
-        //        case FilterType.EmbossAll:
-        //            return (Bitmap)EmbossAll(bitmap, factor);
-        //        case FilterType.EmbossLossy:
-        //            return (Bitmap)EmbossLossy(bitmap, factor);
-        //        case FilterType.EmbossHorizontal:
-        //            return (Bitmap)EmbossHorizontal(bitmap, factor);
-        //        case FilterType.EmbossVertical:
-        //            return (Bitmap)EmbossVertical(bitmap, factor);
-        //        default:
-        //            return bitmap;
-        //    }
-        //}
-
         public static Image CopyImage(Image originalImage)
         {
             try
