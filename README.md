@@ -15,12 +15,27 @@ This project demonstrates common image editing techniques and basic webcam integ
 * 🎨 **Sepia** – Apply a warm, vintage look.
 * 📊 **Histogram** – View the intensity distribution of your image.
 * ➖ **Subtract** – Perform pixel-by-pixel subtraction between two images.
+* 🧮 **Convolutional Matrix Filters** – Apply advanced effects using matrix-based convolution filters:
+
+  * 🌫 **Gaussian Blur** – Smooths the image and reduces noise.
+  * 🔪 **Sharpen** – Enhances edges and fine details.
+  * ⚙️ **Mean Removal** – Increases contrast by emphasizing differences in pixel intensity.
+  * 💫 **Embossing (Laplacian)** – Creates a raised, 3D-like texture using the Laplacian operator.
+  * ↔️ **Embossing (Horizontal/Vertical)** – Highlights edges in specific directions.
+  * 🌀 **Embossing (All Directions)** – Applies multi-directional embossing for stronger texture.
+  * 🧱 **Embossing (Lossy)** – Produces a stylized embossed effect with reduced detail.
+
+You can use these filters either by **uploading a photo** or **opening the webcam** for live processing.
+
+---
 
 ### 🎥 Webcam Support
 
 * Open your **webcam** directly inside the app.
-* Apply **Greyscale**, **Inverse**, or **Sepia** filters in real time.
+* Apply **Greyscale**, **Inverse**, **Sepia**, or **Convolutional Filters** in real time.
 * Switch back to **Normal** view anytime.
+
+---
 
 ### 💾 Save Your Work
 
@@ -50,4 +65,4 @@ This project demonstrates common image editing techniques and basic webcam integ
 
 ---
 
-Made with ❤️ by Carl Angelo T. Pepino - BSCS-3 @ CIT-U
+Made with ❤️ by **Carl Angelo T. Pepino** – BSCS-3 @ CIT-U
